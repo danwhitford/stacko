@@ -13,7 +13,7 @@ import (
 func main() {
 	fmt.Println("==== stacko ===")
 
-	var stack stack.Stack
+	var stack stack.Stack[int]
 	reader := bufio.NewScanner(os.Stdin)
 	var line string
 	for {

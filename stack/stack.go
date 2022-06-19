@@ -5,31 +5,32 @@ import (
 	"strings"
 )
 
-type Stack struct {
-	head *StackNode
+type Stack[T any] struct {
+	head *StackNode[T]
 }
 
-type StackNode struct {
-	val  int
-	next *StackNode
+type StackNode[T any] struct {
+	val  T
+	next *StackNode[T]
 }
 
-func (stack *Stack) Push(val int) {
-	node := StackNode{val: val, next: stack.head}
+func (stack *Stack[T]) Push(val T) {
+	node := StackNode[T]{val: val, next: stack.head}
 	stack.head = &node
 }
 
-func (stack *Stack) Pop() (int, error) {
+func (stack *Stack[T]) Pop() (T, error) {
+	var ret T
 	if stack.head == nil {
-		return 0, fmt.Errorf("stack underflow")
+		return ret, fmt.Errorf("stack underflow")
 	}
-	ret := stack.head.val
+	ret = stack.head.val
 	newHead := stack.head.next
 	stack.head = newHead
 	return ret, nil
 }
 
-func (stack Stack) String() string {
+func (stack Stack[T]) String() string {
 	if stack.head == nil {
 		return "<empty stack>"
 	}
@@ -44,7 +45,7 @@ func (stack Stack) String() string {
 	return sb.String()
 }
 
-func (node StackNode) String() string {
+func (node StackNode[T]) String() string {
 	var sb strings.Builder
 	sb.WriteString(fmt.Sprintf("| %v\n", node.val))
 	return sb.String()
