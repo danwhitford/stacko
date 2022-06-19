@@ -19,14 +19,14 @@ func (stack *Stack) Push(val int) {
 	stack.head = &node
 }
 
-func (stack *Stack) Pop() int {
+func (stack *Stack) Pop() (int, error) {
 	if stack.head == nil {
-		return 0
+		return 0, fmt.Errorf("stack underflow")
 	}
 	ret := stack.head.val
 	newHead := stack.head.next
 	stack.head = newHead
-	return ret
+	return ret, nil
 }
 
 func (stack Stack) String() string {
@@ -40,7 +40,7 @@ func (stack Stack) String() string {
 		sb.WriteString(cur.String())
 		cur = cur.next
 	}
-	sb.WriteString("*-------\n")
+	sb.WriteString("*-------")
 	return sb.String()
 }
 

@@ -18,42 +18,78 @@ func main() {
 	var line string
 	for {
 		fmt.Print(">>> ")
-		reader.Scan()
+		stuff := reader.Scan()
+		if !stuff {
+			break
+		}
 		line = reader.Text()
 		if len(line) < 1 {
 			continue
 		}
 
 		words := strings.Split(line, " ")
+		var err error
 		for _, word := range words {
 			switch word {
 			case "+":
 				{
-					a := stack.Pop()
-					b := stack.Pop()
+					var a, b int
+					a, err = stack.Pop()
+					if err != nil {
+						break
+					}
+					b, err = stack.Pop()
+					if err != nil {
+						break
+					}
 					stack.Push(a + b)
 				}
 			case "-":
 				{
-					a := stack.Pop()
-					b := stack.Pop()
+					var a, b int
+					a, err = stack.Pop()
+					if err != nil {
+						break
+					}
+					b, err = stack.Pop()
+					if err != nil {
+						break
+					}
 					stack.Push(a - b)
 				}
 			case "*":
 				{
-					a := stack.Pop()
-					b := stack.Pop()
+					var a, b int
+					a, err = stack.Pop()
+					if err != nil {
+						break
+					}
+					b, err = stack.Pop()
+					if err != nil {
+						break
+					}
 					stack.Push(a * b)
 				}
 			case "/":
 				{
-					a := stack.Pop()
-					b := stack.Pop()
+					var a, b int
+					a, err = stack.Pop()
+					if err != nil {
+						break
+					}
+					b, err = stack.Pop()
+					if err != nil {
+						break
+					}
 					stack.Push(a / b)
 				}
 			case "dup":
 				{
-					a := stack.Pop()
+					var a int
+					a, err = stack.Pop()
+					if err != nil {
+						break
+					}
 					stack.Push(a)
 					stack.Push(a)
 				}
@@ -63,50 +99,97 @@ func main() {
 				}
 			case "swap":
 				{
-					a := stack.Pop()
-					b := stack.Pop()
+					var a, b int
+					a, err = stack.Pop()
+					if err != nil {
+						break
+					}
+					b, err = stack.Pop()
+					if err != nil {
+						break
+					}
 					stack.Push(a)
 					stack.Push(b)
 				}
 			case "over":
 				{
-					a := stack.Pop()
-					b := stack.Pop()
+					var a, b int
+					a, err = stack.Pop()
+					if err != nil {
+						break
+					}
+					b, err = stack.Pop()
+					if err != nil {
+						break
+					}
 					stack.Push(b)
 					stack.Push(a)
 					stack.Push(b)
 				}
 			case "rot":
 				{
-					a := stack.Pop()
-					b := stack.Pop()
-					c := stack.Pop()
+					var a, b, c int
+					a, err = stack.Pop()
+					if err != nil {
+						break
+					}
+					b, err = stack.Pop()
+					if err != nil {
+						break
+					}
+					c, err = stack.Pop()
+					if err != nil {
+						break
+					}
 					stack.Push(b)
 					stack.Push(a)
 					stack.Push(c)
 				}
 			case ".":
 				{
-					fmt.Printf("%v\n", stack.Pop())
+					var a int
+					a, err = stack.Pop()
+					if err != nil {
+						break
+					}
+					fmt.Printf("%v\n", a)
 				}
 			case "emit":
 				{
-					fmt.Printf("%c", stack.Pop())
+					var a int
+					a, err = stack.Pop()
+					if err != nil {
+						break
+					}
+					fmt.Printf("%c", a)
 				}
-			case "cr": {
-				fmt.Println()
-			}
+			case "cr":
+				{
+					fmt.Println()
+				}
+			case "stack":
+				{
+					fmt.Println(stack)
+				}
 			default:
 				{
-					val, err := strconv.Atoi(word)
+					var val int
+					val, err = strconv.Atoi(word)
 					if err != nil {
-						fmt.Printf("failed to convert '%v' to int\n", err)
-						continue
+						err = fmt.Errorf("could not parse '%v', not a known word or integer", word)
+						break
 					}
 					stack.Push(val)
 				}
 			}
+			if err != nil {
+				break
+			}
 		}
-		fmt.Println(stack)
+		if err != nil {
+			fmt.Println(err)
+		} else {
+			fmt.Println("ok")
+		}
 	}
 }
