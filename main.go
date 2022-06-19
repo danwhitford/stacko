@@ -27,7 +27,7 @@ func main() {
 			continue
 		}
 
-		words := strings.Split(line, " ")
+		words := strings.Fields(line)
 		var err error
 		for _, word := range words {
 			switch word {
