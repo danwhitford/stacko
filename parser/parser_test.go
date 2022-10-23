@@ -10,7 +10,7 @@ func compare(a, b []StackoVal) bool {
 	if len(a) != len(b) {
 		return false
 	}
-	for i, _ := range a {
+	for i := range a {
 		if a[i] != b[i] {
 			return false
 		}
@@ -41,21 +41,24 @@ func TestBasic(t *testing.T) {
 		out []StackoVal
 	}{
 		{
-			[]tokeniser.Token{{tokeniser.Tword, "+", "+"}},
+			[]tokeniser.Token{{TT: tokeniser.Tword, V: "+", Lexeme: "+"}},
 			[]StackoVal{{StackoWord, "+"}},
 		},
 		{
-			[]tokeniser.Token{{tokeniser.Tint, 1, "1"}},
+			[]tokeniser.Token{{TT: tokeniser.Tint, V: 1, Lexeme: "1"}},
 			[]StackoVal{{StackoInt, 1}},
 		}, {
-			[]tokeniser.Token{{tokeniser.Tfloat, 12.7, "12.7"}},
+			[]tokeniser.Token{{TT: tokeniser.Tfloat, V: 12.7, Lexeme: "12.7"}},
 			[]StackoVal{{StackoFloat, 12.7}},
 		}, {
-			[]tokeniser.Token{{tokeniser.Tstring, "spam", "spam"}},
+			[]tokeniser.Token{{TT: tokeniser.Tstring, V: "spam", Lexeme: "spam"}},
 			[]StackoVal{{StackoString, "spam"}},
 		}, {
-			[]tokeniser.Token{{tokeniser.Tword, "+", "+"},{tokeniser.Tint, 1, "1"},{tokeniser.Tstring, "spam", "spam"}},
-			[]StackoVal{{StackoWord, "+"},{StackoInt, 1},{StackoString, "spam"}},
+			[]tokeniser.Token{
+				{TT: tokeniser.Tword, V: "+", Lexeme: "+"},
+				{TT: tokeniser.Tint, V: 1, Lexeme: "1"},
+				{TT: tokeniser.Tstring, V: "spam", Lexeme: "spam"}},
+			[]StackoVal{{StackoWord, "+"}, {StackoInt, 1}, {StackoString, "spam"}},
 		},
 	}
 	testTable(t, table)
