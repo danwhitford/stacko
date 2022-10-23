@@ -1,6 +1,7 @@
 package tokeniser
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 	"unicode"
@@ -37,18 +38,31 @@ func (t Tokeniser) Tokenise() ([]Token, error) {
 	for t.current < t.len {
 		curr := t.src[t.current]
 
-		if unicode.IsDigit(curr) {
-			token, err := t.readInt()
-			if err != nil {
-				return tokens, err
+		switch {
+		case unicode.IsDigit(curr):
+			{
+				token, err := t.readNumber()
+				if err != nil {
+					return tokens, err
+				}
+				tokens = append(tokens, token)
 			}
-			tokens = append(tokens, token)
-		} else {
-			token, err := t.readWord()
-			if err != nil {
-				return tokens, err
+		case (curr == '"'):
+			{
+				token, err := t.readString()
+				if err != nil {
+					return tokens, err
+				}
+				tokens = append(tokens, token)
 			}
-			tokens = append(tokens, token)
+		default:
+			{
+				token, err := t.readWord()
+				if err != nil {
+					return tokens, err
+				}
+				tokens = append(tokens, token)
+			}
 		}
 
 		t.current++
@@ -71,24 +85,44 @@ func (t *Tokeniser) readWord() (Token, error) {
 	return Token{Tword, sb.String(), sb.String()}, nil
 }
 
-func (t *Tokeniser) readInt() (Token, error) {
+func (t *Tokeniser) readNumber() (Token, error) {
 	var sb strings.Builder
 	for t.current < t.len {
 		curr := t.src[t.current]
 		if unicode.IsSpace(curr) {
-			return stringToIntToken(sb.String())
+			return stringToNumberToken(sb.String())
 		}
 		sb.WriteRune(curr)
 		t.current++
 	}
 
-	return stringToIntToken(sb.String())
+	return stringToNumberToken(sb.String())
 }
 
-func stringToIntToken(s string) (Token, error) {
+func stringToNumberToken(s string) (Token, error) {
 	v, err := strconv.Atoi(s)
 	if err != nil {
-		return Token{}, err
+		f, ferr := strconv.ParseFloat(s, 64)
+		if ferr != nil {
+			return Token{}, fmt.Errorf("%v / %v", err, ferr)
+		}
+		return Token{Tfloat, f, s}, nil
 	}
 	return Token{Tint, v, s}, nil
+}
+
+func (t *Tokeniser) readString() (Token, error) {
+	var sb strings.Builder
+	t.current++ // Eat the opening '"'
+	for t.current < t.len {
+		curr := t.src[t.current]
+		if curr == '"' {
+			t.current++ // Eat the closing '"'
+			return Token{Tstring, sb.String(), sb.String()}, nil
+		}
+		sb.WriteRune(curr)
+		t.current++
+	}
+
+	return Token{}, fmt.Errorf("unexpected end of input while reading string")
 }

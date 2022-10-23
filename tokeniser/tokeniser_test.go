@@ -69,3 +69,45 @@ func TestInts(t *testing.T) {
 	}
 	testTable(t, table)
 }
+
+func TestFloats(t *testing.T) {
+	table := []struct {
+		in  string
+		out []Token
+	}{
+		{
+			"1.0",
+			[]Token{{Tfloat, 1.0, "1.0"}},
+		},
+		{
+			"42.7",
+			[]Token{{Tfloat, 42.7, "42.7"}},
+		},
+		{
+			"1.1 2.2 3.3",
+			[]Token{{Tfloat, 1.1, "1.1"}, {Tfloat, 2.2, "2.2"}, {Tfloat, 3.3, "3.3"}},
+		},
+	}
+	testTable(t, table)
+}
+
+func TestStrings(t *testing.T) {
+	table := []struct {
+		in  string
+		out []Token
+	}{
+		{
+			`"foo"`,
+			[]Token{{Tstring, "foo", "foo"}},
+		},
+		{
+			`"foo bar"`,
+			[]Token{{Tstring, "foo bar", "foo bar"}},
+		},
+		{
+			`"foo" "bar" "baz"`,
+			[]Token{{Tstring, "foo", "foo"}, {Tstring, "bar", "bar"}, {Tstring, "baz", "baz"}},
+		},
+	}
+	testTable(t, table)
+}
