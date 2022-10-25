@@ -33,6 +33,10 @@ func main() {
 		}
 
 		vm.Load(vals)
-		vm.Execute()
+		err = vm.Execute()
+		if err != nil {
+			log.Println(err)
+			continue
+		}
 	}
 }
