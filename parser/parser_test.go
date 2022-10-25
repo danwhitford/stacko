@@ -3,10 +3,11 @@ package parser
 import (
 	"testing"
 
+	"github.com/danwhitford/stacko/stack"
 	"github.com/danwhitford/stacko/tokeniser"
 )
 
-func compare(a, b []StackoVal) bool {
+func compare(a, b []stack.StackoVal) bool {
 	if len(a) != len(b) {
 		return false
 	}
@@ -20,7 +21,7 @@ func compare(a, b []StackoVal) bool {
 
 func testTable(t *testing.T, table []struct {
 	in  []tokeniser.Token
-	out []StackoVal
+	out []stack.StackoVal
 }) {
 	var parser Parser
 	for _, tst := range table {
@@ -38,27 +39,27 @@ func testTable(t *testing.T, table []struct {
 func TestBasic(t *testing.T) {
 	table := []struct {
 		in  []tokeniser.Token
-		out []StackoVal
+		out []stack.StackoVal
 	}{
 		{
 			[]tokeniser.Token{{TT: tokeniser.Tword, V: "+", Lexeme: "+"}},
-			[]StackoVal{{StackoWord, "+"}},
+			[]stack.StackoVal{{stack.StackoWord, "+"}},
 		},
 		{
 			[]tokeniser.Token{{TT: tokeniser.Tint, V: 1, Lexeme: "1"}},
-			[]StackoVal{{StackoInt, 1}},
+			[]stack.StackoVal{{stack.StackoInt, 1}},
 		}, {
 			[]tokeniser.Token{{TT: tokeniser.Tfloat, V: 12.7, Lexeme: "12.7"}},
-			[]StackoVal{{StackoFloat, 12.7}},
+			[]stack.StackoVal{{stack.StackoFloat, 12.7}},
 		}, {
 			[]tokeniser.Token{{TT: tokeniser.Tstring, V: "spam", Lexeme: "spam"}},
-			[]StackoVal{{StackoString, "spam"}},
+			[]stack.StackoVal{{stack.StackoString, "spam"}},
 		}, {
 			[]tokeniser.Token{
 				{TT: tokeniser.Tword, V: "+", Lexeme: "+"},
 				{TT: tokeniser.Tint, V: 1, Lexeme: "1"},
 				{TT: tokeniser.Tstring, V: "spam", Lexeme: "spam"}},
-			[]StackoVal{{StackoWord, "+"}, {StackoInt, 1}, {StackoString, "spam"}},
+			[]stack.StackoVal{{stack.StackoWord, "+"}, {stack.StackoInt, 1}, {stack.StackoString, "spam"}},
 		},
 	}
 	testTable(t, table)

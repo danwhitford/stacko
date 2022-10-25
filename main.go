@@ -2,18 +2,19 @@ package main
 
 import (
 	"bufio"
-	"fmt"
 	"log"
 	"os"
 
-	"github.com/danwhitford/stacko/tokeniser"
 	"github.com/danwhitford/stacko/parser"
+	"github.com/danwhitford/stacko/tokeniser"
+	"github.com/danwhitford/stacko/vm"
 )
 
 func main() {
 	scanner := bufio.NewScanner(os.Stdin)
 	var tknsr tokeniser.Tokeniser
 	var prser parser.Parser
+	vm := vm.NewVM()
 
 	for scanner.Scan() {
 		t := scanner.Text()
@@ -31,6 +32,7 @@ func main() {
 			continue
 		}
 
-		fmt.Printf("%+v\n", vals)
+		vm.Load(vals)
+		vm.Execute()
 	}
 }

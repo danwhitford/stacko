@@ -1,16 +1,22 @@
 package stack
 
-import "testing"
+import (
+	"testing"
+
+)
 
 func TestPushBasic(t *testing.T) {
 	var stack Stack
-	stack.Push(stackFrame{1, Tint})
-	stack.Push(stackFrame{5.5, Tfloat})
-	stack.Push(stackFrame{"egg shell", Tstring})
+	stack.Push(StackoVal{StackoInt, 1})
+	stack.Push(StackoVal{StackoFloat, 5.5})
+	stack.Push(StackoVal{StackoFloat, 5.5})
 }
 
 func TestPopBasic(t *testing.T) {
-	tests := []stackFrame{{1, Tint}, {5.5, Tfloat}, {"egg shell", Tstring}}
+	tests := []StackoVal{
+		{StackoInt, 1},
+		{StackoFloat, 5.5},
+		{StackoFloat, 5.5}}
 	var stack Stack
 
 	for _, tst := range tests {
@@ -26,7 +32,10 @@ func TestPopBasic(t *testing.T) {
 }
 
 func TestPopMany(t *testing.T) {
-	tests := []stackFrame{{1, Tint}, {5.5, Tfloat}, {"egg shell", Tstring}}
+	tests := []StackoVal{
+		{StackoInt, 1},
+		{StackoFloat, 5.5},
+		{StackoFloat, 5.5}}
 	var stack Stack
 
 	for _, tst := range tests {
