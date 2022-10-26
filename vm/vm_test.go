@@ -25,7 +25,7 @@ func TestMaths(t *testing.T) {
 				{StackoType: stack.StackoWord, Val: "+"}},
 			expected: 6.5,
 		},
-		{	
+		{
 			input: []stack.StackoVal{
 				{StackoType: stack.StackoFloat, Val: 1.0},
 				{StackoType: stack.StackoInt, Val: 5},
@@ -142,4 +142,20 @@ func ExampleDrop() {
 	vm.Execute()
 	// Output:
 	// 1
+}
+
+func ExampleList() {
+	vm := NewVM()
+	vm.Load([]stack.StackoVal{
+		{StackoType: stack.StackoList, Val: []stack.StackoVal{
+			{StackoType: stack.StackoString, Val: "foo"},
+			{StackoType: stack.StackoList, Val: []stack.StackoVal{
+				{StackoType: stack.StackoString, Val: "bar"},
+				{StackoType: stack.StackoString, Val: "baz"},
+			}}}},
+		{StackoType: stack.StackoWord, Val: "v"},
+	})
+	vm.Execute()
+	// Output:
+	// [foo[bar baz]]
 }

@@ -33,8 +33,6 @@ func (vm *VM) Load(extras []stack.StackoVal) {
 func (vm *VM) Execute() error {
 	for vm.instructionPtr < vm.len {
 		switch curr := vm.instructions[vm.instructionPtr]; curr.StackoType {
-		case stack.StackoInt, stack.StackoFloat, stack.StackoString:
-			vm.stack.Push(curr)
 		case stack.StackoWord:
 			f, ok := vm.builtins[curr.Val.(string)]
 			if !ok {
@@ -46,6 +44,8 @@ func (vm *VM) Execute() error {
 				vm.instructionPtr++
 				return fmt.Errorf("error while executing %v: %w", curr, err)
 			}
+		default:
+			vm.stack.Push(curr)
 		}
 		vm.instructionPtr++
 	}

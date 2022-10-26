@@ -2,7 +2,7 @@ package stack
 
 import (
 	"fmt"
-
+	"strings"
 )
 
 //go:generate stringer -type=StackoType
@@ -19,6 +19,20 @@ const (
 type StackoVal struct {
 	StackoType StackoType
 	Val        interface{}
+}
+
+func (val StackoVal) String() string {
+	if val.StackoType == StackoList {
+		var sb strings.Builder
+		sb.WriteRune('[')
+		for _, v := range val.Val.([]StackoVal) {
+			sb.WriteString(fmt.Sprint(v.Val))
+		}
+		sb.WriteRune(']')
+		return sb.String()
+	} else {
+		return fmt.Sprintf("%v", val.Val)
+	}
 }
 
 type Stack []StackoVal

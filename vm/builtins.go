@@ -1,9 +1,9 @@
 package vm
+
 //go:generate go run builtin_gen.go
 
 import (
 	"fmt"
-
 	"github.com/danwhitford/stacko/stack"
 )
 
@@ -22,9 +22,9 @@ var builtins = map[string]func(*stack.Stack) error{
 	"*": Mult,
 	"/": Div,
 	".": Drop,
-	"v": func(stk *stack.Stack) error {
+	"v": func(stk *stack.Stack) error {		
 		for i := len(*stk) - 1; i >= 0; i-- {
-			fmt.Printf("%v\n", (*stk)[i].Val)
+			fmt.Println((*stk)[i])
 		}
 		return nil
 	},
