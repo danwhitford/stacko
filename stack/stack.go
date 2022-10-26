@@ -5,17 +5,19 @@ import (
 
 )
 
-type stackoType int
+//go:generate stringer -type=StackoType
+type StackoType int
 
 const (
-	StackoString = iota
+	StackoString StackoType = iota
 	StackoInt
 	StackoFloat
 	StackoWord
+	StackoList
 )
 
 type StackoVal struct {
-	StackoType stackoType
+	StackoType StackoType
 	Val        interface{}
 }
 

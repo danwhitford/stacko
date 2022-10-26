@@ -5,19 +5,8 @@ import (
 
 	"github.com/danwhitford/stacko/stack"
 	"github.com/danwhitford/stacko/tokeniser"
+	"github.com/google/go-cmp/cmp"
 )
-
-func compare(a, b []stack.StackoVal) bool {
-	if len(a) != len(b) {
-		return false
-	}
-	for i := range a {
-		if a[i] != b[i] {
-			return false
-		}
-	}
-	return true
-}
 
 func testTable(t *testing.T, table []struct {
 	in  []tokeniser.Token
@@ -30,9 +19,10 @@ func testTable(t *testing.T, table []struct {
 		if err != nil {
 			t.Error(err)
 		}
-		if !compare(vals, tst.out) {
-			t.Errorf("expected %+v got %+v", tst.out, vals)
-		}
+		diff := cmp.Diff(tst.out, vals)
+		if diff != "" {
+			t.Error(diff)
+		}		
 	}
 }
 
@@ -60,6 +50,47 @@ func TestBasic(t *testing.T) {
 				{TT: tokeniser.Tint, V: 1, Lexeme: "1"},
 				{TT: tokeniser.Tstring, V: "spam", Lexeme: "spam"}},
 			[]stack.StackoVal{{stack.StackoWord, "+"}, {stack.StackoInt, 1}, {stack.StackoString, "spam"}},
+		},
+	}
+	testTable(t, table)
+}
+
+
+func TestLists(t *testing.T) {
+	table := []struct {
+		in  []tokeniser.Token
+		out []stack.StackoVal
+	}{
+		{
+			[]tokeniser.Token{
+				{TT: tokeniser.TLSqB, V: "[", Lexeme: "["},
+				{TT: tokeniser.Tstring, V: "foo bar", Lexeme: "foo bar"},
+				{TT: tokeniser.TRSqB, V: "]", Lexeme: "]"},
+			},
+			[]stack.StackoVal{
+				{StackoType: stack.StackoList, Val: []stack.StackoVal{
+					{StackoType: stack.StackoString, Val: "foo bar"},
+				}},
+			},
+		},
+		{
+			[]tokeniser.Token{
+				{TT: tokeniser.TLSqB, V: "[", Lexeme: "["},
+				{TT: tokeniser.Tstring, V: "foo", Lexeme: "foo"},
+				{TT: tokeniser.TLSqB, V: "[", Lexeme: "["},
+				{TT: tokeniser.Tstring, V: "bar", Lexeme: "bar"},
+				{TT: tokeniser.Tstring, V: "baz", Lexeme: "baz"},
+				{TT: tokeniser.TRSqB, V: "]", Lexeme: "]"},
+				{TT: tokeniser.TRSqB, V: "]", Lexeme: "]"},
+			},
+			[]stack.StackoVal{
+				{StackoType: stack.StackoList, Val: []stack.StackoVal{
+					{StackoType: stack.StackoString, Val: "foo"},
+					{StackoType: stack.StackoList, Val: []stack.StackoVal{
+						{StackoType: stack.StackoString, Val: "bar"},
+						{StackoType: stack.StackoString, Val: "baz"},
+				}}}},
+			},
 		},
 	}
 	testTable(t, table)

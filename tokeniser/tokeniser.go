@@ -7,17 +7,20 @@ import (
 	"unicode"
 )
 
-type tokenType int
+//go:generate stringer -type=TokenType
+type TokenType int
 
 const (
-	Tstring = iota
+	Tstring TokenType = iota
 	Tint
 	Tfloat
 	Tword
+	TLSqB
+	TRSqB
 )
 
 type Token struct {
-	TT     tokenType
+	TT     TokenType
 	V      interface{}
 	Lexeme string
 }
@@ -39,6 +42,9 @@ func (t Tokeniser) Tokenise() ([]Token, error) {
 		curr := t.src[t.current]
 
 		switch {
+		case unicode.IsSpace(curr):
+			t.current++
+			continue
 		case unicode.IsDigit(curr):
 			{
 				token, err := t.readNumber()
@@ -53,6 +59,16 @@ func (t Tokeniser) Tokenise() ([]Token, error) {
 				if err != nil {
 					return tokens, err
 				}
+				tokens = append(tokens, token)
+			}
+		case (curr == '['):
+			{
+				token := Token{TLSqB, "[", "["}
+				tokens = append(tokens, token)
+			}
+		case (curr == ']'):
+			{
+				token := Token{TRSqB, "]", "]"}
 				tokens = append(tokens, token)
 			}
 		default:
@@ -117,7 +133,6 @@ func (t *Tokeniser) readString() (Token, error) {
 	for t.current < t.len {
 		curr := t.src[t.current]
 		if curr == '"' {
-			t.current++ // Eat the closing '"'
 			return Token{Tstring, sb.String(), sb.String()}, nil
 		}
 		sb.WriteRune(curr)

@@ -7,19 +7,21 @@ import (
 	"github.com/danwhitford/stacko/stack"
 )
 
+func Drop(stk *stack.Stack) error {
+	a, err := stk.Pop()
+	if err != nil {
+		return err
+	}
+	fmt.Printf("%v\n", a.Val)
+	return nil
+}
+
 var builtins = map[string]func(*stack.Stack) error{
 	"+": Add,
 	"-": Sub,
 	"*": Mult,
 	"/": Div,
-	".": func(stk *stack.Stack) error {
-		a, err := stk.Pop()
-		if err != nil {
-			return err
-		}
-		fmt.Printf("%v\n", a.Val)
-		return nil
-	},
+	".": Drop,
 	"v": func(stk *stack.Stack) error {
 		for i := len(*stk) - 1; i >= 0; i-- {
 			fmt.Printf("%v\n", (*stk)[i].Val)

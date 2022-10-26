@@ -1,20 +1,15 @@
 package tokeniser
 
-import "testing"
+import (
+	"testing"
 
-func compare(a, b []Token) bool {
-	if len(a) != len(b) {
-		return false
-	}
-	for i := range a {
-		if a[i] != b[i] {
-			return false
-		}
-	}
-	return true
-}
+	"github.com/google/go-cmp/cmp"
+)
 
-func testTable(t *testing.T, table []struct{in string; out []Token }) {
+func testTable(t *testing.T, table []struct {
+	in  string
+	out []Token
+}) {
 	var tokeniser Tokeniser
 	for _, tst := range table {
 		tokeniser = NewTokeniser(tst.in)
@@ -22,8 +17,9 @@ func testTable(t *testing.T, table []struct{in string; out []Token }) {
 		if err != nil {
 			t.Error(err)
 		}
-		if !compare(tokens, tst.out) {
-			t.Errorf("expected %+v got %+v", tst.out, tokens)
+		diff := cmp.Diff(tst.out, tokens)
+		if diff != "" {
+			t.Errorf("mismatch (-want +got):\n%s", diff)
 		}
 	}
 }
@@ -107,6 +103,43 @@ func TestStrings(t *testing.T) {
 		{
 			`"foo" "bar" "baz"`,
 			[]Token{{Tstring, "foo", "foo"}, {Tstring, "bar", "bar"}, {Tstring, "baz", "baz"}},
+		},
+	}
+	testTable(t, table)
+}
+
+func TestList(t *testing.T) {
+	table := []struct {
+		in  string
+		out []Token
+	}{
+		{
+			`[ "foo" ]`,
+			[]Token{
+				{TLSqB, "[", "["},
+				{Tstring, "foo", "foo"},
+				{TRSqB, "]", "]"},
+			},
+		},
+		{
+			`["foo bar"]`,
+			[]Token{
+				{TLSqB, "[", "["},
+				{Tstring, "foo bar", "foo bar"},
+				{TRSqB, "]", "]"},
+			},
+		},
+		{
+			`["foo" ["bar" "baz"]]`,
+			[]Token{
+				{TLSqB, "[", "["},
+				{Tstring, "foo", "foo"},
+				{TLSqB, "[", "["},
+				{Tstring, "bar", "bar"},
+				{Tstring, "baz", "baz"},
+				{TRSqB, "]", "]"},
+				{TRSqB, "]", "]"},
+			},
 		},
 	}
 	testTable(t, table)

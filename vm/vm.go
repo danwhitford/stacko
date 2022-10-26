@@ -8,7 +8,7 @@ import (
 
 type VM struct {
 	builtins       map[string]func(*stack.Stack) error
-	userDict       map[string]stack.StackoVal
+	dictionary     map[string]stack.StackoVal
 	instructions   []stack.StackoVal
 	instructionPtr int
 	len            int
@@ -41,7 +41,7 @@ func (vm *VM) Execute() error {
 				vm.instructionPtr++
 				return fmt.Errorf("could not find word in dict: %s", curr.Val)
 			}
-			err := f(&vm.stack)			
+			err := f(&vm.stack)
 			if err != nil {
 				vm.instructionPtr++
 				return fmt.Errorf("error while executing %v: %w", curr, err)

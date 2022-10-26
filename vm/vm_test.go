@@ -25,7 +25,7 @@ func TestMaths(t *testing.T) {
 				{StackoType: stack.StackoWord, Val: "+"}},
 			expected: 6.5,
 		},
-		{
+		{	
 			input: []stack.StackoVal{
 				{StackoType: stack.StackoFloat, Val: 1.0},
 				{StackoType: stack.StackoInt, Val: 5},
