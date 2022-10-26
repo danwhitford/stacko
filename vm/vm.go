@@ -34,15 +34,21 @@ func (vm *VM) Execute() error {
 	for vm.instructionPtr < vm.len {
 		switch curr := vm.instructions[vm.instructionPtr]; curr.StackoType {
 		case stack.StackoWord:
-			f, ok := vm.builtins[curr.Val.(string)]
-			if !ok {
-				vm.instructionPtr++
-				return fmt.Errorf("could not find word in dict: %s", curr.Val)
-			}
-			err := f(&vm.stack)
+			execd, err := vm.execBuiltin()
 			if err != nil {
-				vm.instructionPtr++
 				return fmt.Errorf("error while executing %v: %w", curr, err)
+			}
+			if !execd {
+				f, ok := vm.builtins[curr.Val.(string)]
+				if !ok {
+					vm.instructionPtr++
+					return fmt.Errorf("could not find word in dict: %s", curr.Val)
+				}
+				err := f(&vm.stack)
+				if err != nil {
+					vm.instructionPtr++
+					return fmt.Errorf("error while executing %v: %w", curr, err)
+				}
 			}
 		default:
 			vm.stack.Push(curr)

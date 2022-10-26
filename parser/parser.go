@@ -63,7 +63,7 @@ func (parser *Parser) readList() (stack.StackoVal, error) {
 		if err != nil {
 			return stack.StackoVal{}, err
 		}
-		listEls = append(listEls,thing)
+		listEls = append(listEls, thing)
 		parser.current++
 	}
 

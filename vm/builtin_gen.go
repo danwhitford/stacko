@@ -3,9 +3,9 @@
 package main
 
 import (
+	"log"
 	"os"
 	"text/template"
-	"log"
 )
 
 const tmpl string = `
@@ -14,31 +14,31 @@ package vm
 import 	"github.com/danwhitford/stacko/stack"
 
 {{ range . }}
-func {{ .Name }}(stk *stack.Stack)   error {
-	a, err := stk.Pop()
+func (vm *VM) {{ .Name }}() error {
+	a, err := vm.stack.Pop()
 	if err != nil {
 		return err
 	}
-	b, err := stk.Pop()
+	b, err := vm.stack.Pop()
 	if err != nil {
 		return err
 	}
 
 	switch {
 	case a.StackoType == stack.StackoInt && b.StackoType == stack.StackoInt:
-		stk.Push(stack.StackoVal{StackoType: stack.StackoInt, Val: b.Val.(int) {{ .Op }} a.Val.(int)})
+		vm.stack.Push(stack.StackoVal{StackoType: stack.StackoInt, Val: b.Val.(int) {{ .Op }} a.Val.(int)})
 	case a.StackoType == stack.StackoInt && b.StackoType == stack.StackoFloat:
 		aa := float64(a.Val.(int))
 		bb := b.Val.(float64)
-		stk.Push(stack.StackoVal{StackoType: stack.StackoFloat, Val: bb {{ .Op }} aa})
+		vm.stack.Push(stack.StackoVal{StackoType: stack.StackoFloat, Val: bb {{ .Op }} aa})
 	case a.StackoType == stack.StackoFloat && b.StackoType == stack.StackoInt:
 		aa := a.Val.(float64)
 		bb := float64(b.Val.(int))
-		stk.Push(stack.StackoVal{StackoType: stack.StackoFloat, Val: bb {{ .Op }} aa})
+		vm.stack.Push(stack.StackoVal{StackoType: stack.StackoFloat, Val: bb {{ .Op }} aa})
 	case a.StackoType == stack.StackoFloat && b.StackoType == stack.StackoFloat:
 		aa := a.Val.(float64)
 		bb := b.Val.(float64)
-		stk.Push(stack.StackoVal{StackoType: stack.StackoFloat, Val: bb {{ .Op }} aa})
+		vm.stack.Push(stack.StackoVal{StackoType: stack.StackoFloat, Val: bb {{ .Op }} aa})
 	}
 
 	return nil
@@ -49,23 +49,23 @@ func {{ .Name }}(stk *stack.Stack)   error {
 func main() {
 	var operators = []struct {
 		Name string
-		Op string
+		Op   string
 	}{
 		{
 			Name: "Add",
-			Op: "+",
+			Op:   "+",
 		},
 		{
 			Name: "Sub",
-			Op: "-",
+			Op:   "-",
 		},
 		{
 			Name: "Mult",
-			Op: "*",
+			Op:   "*",
 		},
 		{
 			Name: "Div",
-			Op: "/",
+			Op:   "/",
 		},
 	}
 
@@ -73,7 +73,7 @@ func main() {
 	if err != nil {
 		log.Fatal("executing template:", err)
 	}
-	
+
 	f, err := os.Create("maths_builtins.go")
 	if err != nil {
 		log.Fatal("executing template:", err)

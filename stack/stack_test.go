@@ -2,7 +2,6 @@ package stack
 
 import (
 	"testing"
-
 )
 
 func TestPushBasic(t *testing.T) {

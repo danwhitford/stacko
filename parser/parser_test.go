@@ -22,7 +22,7 @@ func testTable(t *testing.T, table []struct {
 		diff := cmp.Diff(tst.out, vals)
 		if diff != "" {
 			t.Error(diff)
-		}		
+		}
 	}
 }
 
@@ -54,7 +54,6 @@ func TestBasic(t *testing.T) {
 	}
 	testTable(t, table)
 }
-
 
 func TestLists(t *testing.T) {
 	table := []struct {
@@ -89,7 +88,7 @@ func TestLists(t *testing.T) {
 					{StackoType: stack.StackoList, Val: []stack.StackoVal{
 						{StackoType: stack.StackoString, Val: "bar"},
 						{StackoType: stack.StackoString, Val: "baz"},
-				}}}},
+					}}}},
 			},
 		},
 	}

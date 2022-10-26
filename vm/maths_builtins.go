@@ -1,10 +1,9 @@
-
 package vm
 
-import 	"github.com/danwhitford/stacko/stack"
+import "github.com/danwhitford/stacko/stack"
 
-
-func Add(stk *stack.Stack)   error {
+func (vm *VM) Add() error {
+	stk := vm.stack
 	a, err := stk.Pop()
 	if err != nil {
 		return err
@@ -34,7 +33,8 @@ func Add(stk *stack.Stack)   error {
 	return nil
 }
 
-func Sub(stk *stack.Stack)   error {
+func (vm *VM) Sub() error {
+	stk := vm.stack
 	a, err := stk.Pop()
 	if err != nil {
 		return err
@@ -64,7 +64,8 @@ func Sub(stk *stack.Stack)   error {
 	return nil
 }
 
-func Mult(stk *stack.Stack)   error {
+func (vm *VM) Mult() error {
+	stk := vm.stack
 	a, err := stk.Pop()
 	if err != nil {
 		return err
@@ -94,7 +95,8 @@ func Mult(stk *stack.Stack)   error {
 	return nil
 }
 
-func Div(stk *stack.Stack)   error {
+func (vm *VM) Div() error {
+	stk := vm.stack
 	a, err := stk.Pop()
 	if err != nil {
 		return err
@@ -123,4 +125,3 @@ func Div(stk *stack.Stack)   error {
 
 	return nil
 }
-
