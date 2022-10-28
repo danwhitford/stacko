@@ -25,8 +25,11 @@ func (val StackoVal) String() string {
 	if val.StackoType == StackoList {
 		var sb strings.Builder
 		sb.WriteRune('[')
-		for _, v := range val.Val.([]StackoVal) {
+		for i, v := range val.Val.([]StackoVal) {
 			sb.WriteString(fmt.Sprint(v.Val))
+			if i < len(val.Val.([]StackoVal))-1 {
+				sb.WriteRune(' ')
+			}
 		}
 		sb.WriteRune(']')
 		return sb.String()

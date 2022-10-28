@@ -27,6 +27,7 @@ func (vm *VM) {{ .Name }}() error {
 	switch {
 	case a.StackoType == stack.StackoInt && b.StackoType == stack.StackoInt:
 		vm.stack.Push(stack.StackoVal{StackoType: stack.StackoInt, Val: b.Val.(int) {{ .Op }} a.Val.(int)})
+{{ if not .IntOnly }}
 	case a.StackoType == stack.StackoInt && b.StackoType == stack.StackoFloat:
 		aa := float64(a.Val.(int))
 		bb := b.Val.(float64)
@@ -39,8 +40,8 @@ func (vm *VM) {{ .Name }}() error {
 		aa := a.Val.(float64)
 		bb := b.Val.(float64)
 		vm.stack.Push(stack.StackoVal{StackoType: stack.StackoFloat, Val: bb {{ .Op }} aa})
+{{ end }}
 	}
-
 	return nil
 }
 {{end}}
@@ -48,8 +49,9 @@ func (vm *VM) {{ .Name }}() error {
 
 func main() {
 	var operators = []struct {
-		Name string
-		Op   string
+		Name    string
+		Op      string
+		IntOnly bool
 	}{
 		{
 			Name: "Add",
@@ -67,20 +69,25 @@ func main() {
 			Name: "Div",
 			Op:   "/",
 		},
+		{
+			Name:    "Mod",
+			Op:      "%",
+			IntOnly: true,
+		},
 	}
 
 	t, err := template.New("letter").Parse(tmpl)
 	if err != nil {
-		log.Fatal("executing template:", err)
+		log.Fatal("error executing template:", err)
 	}
 
 	f, err := os.Create("maths_builtins.go")
 	if err != nil {
-		log.Fatal("executing template:", err)
+		log.Fatal("error executing template:", err)
 	}
 	defer f.Close()
 	err = t.Execute(f, operators)
 	if err != nil {
-		log.Fatal("executing template:", err)
+		log.Fatal("error executing template:", err)
 	}
 }

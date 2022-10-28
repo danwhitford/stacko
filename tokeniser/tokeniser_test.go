@@ -141,6 +141,24 @@ func TestList(t *testing.T) {
 				{TRSqB, "]", "]"},
 			},
 		},
+		{
+			`["foo bar"]`,
+			[]Token{
+				{TLSqB, "[", "["},
+				{Tstring, "foo bar", "foo bar"},
+				{TRSqB, "]", "]"},
+			},
+		},
+		{
+			`[foo bar baz]`,
+			[]Token{
+				{TLSqB, "[", "["},
+				{Tword, "foo", "foo"},
+				{Tword, "bar", "bar"},
+				{Tword, "baz", "baz"},
+				{TRSqB, "]", "]"},
+			},
+		},
 	}
 	testTable(t, table)
 }

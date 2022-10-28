@@ -21,14 +21,14 @@ func main() {
 		tknsr = tokeniser.NewTokeniser(t)
 		tokens, err := tknsr.Tokenise()
 		if err != nil {
-			log.Println(err)
+			log.Printf("error while tokenising: %s\n", err)
 			continue
 		}
 
 		prser = parser.NewParser(tokens)
 		vals, err := prser.Parse()
 		if err != nil {
-			log.Println(err)
+			log.Printf("error while parsing: %s\n", err)
 			continue
 		}
 

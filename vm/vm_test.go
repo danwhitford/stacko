@@ -60,6 +60,13 @@ func TestMaths(t *testing.T) {
 				{StackoType: stack.StackoWord, Val: "/"}},
 			expected: 2,
 		},
+		{
+			input: []stack.StackoVal{
+				{StackoType: stack.StackoInt, Val: 10},
+				{StackoType: stack.StackoInt, Val: 3},
+				{StackoType: stack.StackoWord, Val: "%"}},
+			expected: 1,
+		},
 	}
 
 	for _, tst := range tests {
@@ -144,9 +151,14 @@ func ExampleDrop() {
 	// 1
 }
 
-func ExampleList() {
+func ExampleVM_PrintStack() {
 	vm := NewVM()
 	vm.Load([]stack.StackoVal{
+		{StackoType: stack.StackoList, Val: []stack.StackoVal{
+			{StackoType: stack.StackoString, Val: "foo"},
+			{StackoType: stack.StackoString, Val: "bar"},
+			{StackoType: stack.StackoString, Val: "baz"},
+		}},
 		{StackoType: stack.StackoList, Val: []stack.StackoVal{
 			{StackoType: stack.StackoString, Val: "foo"},
 			{StackoType: stack.StackoList, Val: []stack.StackoVal{
@@ -157,5 +169,6 @@ func ExampleList() {
 	})
 	vm.Execute()
 	// Output:
-	// [foo[bar baz]]
+	// [foo [bar baz]]
+	// [foo bar baz]
 }

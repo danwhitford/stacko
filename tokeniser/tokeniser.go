@@ -91,7 +91,8 @@ func (t *Tokeniser) readWord() (Token, error) {
 	var sb strings.Builder
 	for t.current < t.len {
 		curr := t.src[t.current]
-		if unicode.IsSpace(curr) {
+		if unicode.IsSpace(curr) || curr == ']' {
+			t.current-- // Put back so curr is processed in main loop
 			return Token{Tword, sb.String(), sb.String()}, nil
 		}
 		sb.WriteRune(curr)
