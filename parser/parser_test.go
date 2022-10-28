@@ -33,23 +33,26 @@ func TestBasic(t *testing.T) {
 	}{
 		{
 			[]tokeniser.Token{{TT: tokeniser.Tword, V: "+", Lexeme: "+"}},
-			[]stack.StackoVal{{stack.StackoWord, "+"}},
+			[]stack.StackoVal{{StackoType: stack.StackoWord, Val: "+"}},
 		},
 		{
 			[]tokeniser.Token{{TT: tokeniser.Tint, V: 1, Lexeme: "1"}},
-			[]stack.StackoVal{{stack.StackoInt, 1}},
+			[]stack.StackoVal{{StackoType: stack.StackoInt, Val: 1}},
 		}, {
 			[]tokeniser.Token{{TT: tokeniser.Tfloat, V: 12.7, Lexeme: "12.7"}},
-			[]stack.StackoVal{{stack.StackoFloat, 12.7}},
+			[]stack.StackoVal{{StackoType: stack.StackoFloat, Val: 12.7}},
 		}, {
 			[]tokeniser.Token{{TT: tokeniser.Tstring, V: "spam", Lexeme: "spam"}},
-			[]stack.StackoVal{{stack.StackoString, "spam"}},
+			[]stack.StackoVal{{StackoType: stack.StackoString, Val: "spam"}},
 		}, {
 			[]tokeniser.Token{
 				{TT: tokeniser.Tword, V: "+", Lexeme: "+"},
 				{TT: tokeniser.Tint, V: 1, Lexeme: "1"},
 				{TT: tokeniser.Tstring, V: "spam", Lexeme: "spam"}},
-			[]stack.StackoVal{{stack.StackoWord, "+"}, {stack.StackoInt, 1}, {stack.StackoString, "spam"}},
+			[]stack.StackoVal{
+				{StackoType: stack.StackoWord, Val: "+"}, 
+				{StackoType: stack.StackoInt, Val: 1}, 
+				{StackoType: stack.StackoString, Val: "spam"}},
 		},
 		{
 			[]tokeniser.Token{
@@ -58,9 +61,9 @@ func TestBasic(t *testing.T) {
 				{TT: tokeniser.Tword, V: "baz", Lexeme: "baz"},
 			},
 			[]stack.StackoVal{
-				{stack.StackoWord, "foo"},
-				{stack.StackoWord, "bar"},
-				{stack.StackoWord, "baz"},
+				{StackoType: stack.StackoWord, Val: "foo"},
+				{StackoType: stack.StackoWord, Val: "bar"},
+				{StackoType: stack.StackoWord, Val: "baz"},
 			},
 		},
 	}
