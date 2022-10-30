@@ -66,6 +66,16 @@ func TestBasic(t *testing.T) {
 				{StackoType: stackoval.StackoWord, Val: "baz"},
 			},
 		},
+		{
+			[]tokeniser.Token{
+				{TT: tokeniser.Tsymbol, V: "foo", Lexeme: "'foo"},
+				{TT: tokeniser.Tsymbol, V: "bar", Lexeme: "'bar"},
+			},
+			[]stackoval.StackoVal{
+				{StackoType: stackoval.StackoSymbol, Val: "foo"},
+				{StackoType: stackoval.StackoSymbol, Val: "bar"},
+			},
+		},
 	}
 	testTable(t, table)
 }

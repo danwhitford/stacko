@@ -1,6 +1,7 @@
 package vm
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/danwhitford/stacko/stackoval"
@@ -172,4 +173,24 @@ func ExampleVM_PrintStack() {
 	// Output:
 	// [foo [bar baz]]
 	// [foo bar baz]
+}
+
+func ExampleDefVar() {
+	vm := NewVM()
+	vm.Load([]stackoval.StackoVal{
+			{StackoType: stackoval.StackoInt, Val: 5},
+			{StackoType: stackoval.StackoSymbol, Val: "foo"},
+			{StackoType: stackoval.StackoWord, Val: "def"},
+			{StackoType: stackoval.StackoWord, Val: "foo"},
+			{StackoType: stackoval.StackoWord, Val: "foo"},
+			{StackoType: stackoval.StackoWord, Val: "+"},
+			{StackoType: stackoval.StackoWord, Val: "v"},
+			
+	})
+	err := vm.Execute()
+	if err != nil {
+		fmt.Println(err)
+	}
+	// Output:
+	// 10
 }

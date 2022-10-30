@@ -46,6 +46,8 @@ func (parser *Parser) parseToken() (stackoval.StackoVal, error) {
 		return stackoval.StackoVal{StackoType: stackoval.StackoInt, Val: curr.V}, nil
 	case tokeniser.TLSqB:
 		return parser.readList()
+	case tokeniser.Tsymbol:
+		return stackoval.StackoVal{StackoType: stackoval.StackoSymbol, Val: curr.V}, nil
 	default:
 		return stackoval.StackoVal{}, fmt.Errorf("unrecognised token type: %+v", curr)
 	}

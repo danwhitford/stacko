@@ -58,9 +58,18 @@ func (vm *VM) execBuiltin(word string) (bool, error) {
 		return true, vm.Rot()
 	case "drop":
 		return true, vm.Drop()
+	case "def":
+		return true, vm.Def()
+	case "dbg":
+		return true, vm.Dbg()
 	default:
 		return false, nil
 	}
+}
+
+func (vm *VM) Dbg() error {
+	fmt.Printf("%+v\n", *vm)
+	return nil
 }
 
 func (vm *VM) Swap() error {
@@ -118,4 +127,17 @@ func (vm *VM) Drop() error {
 	stack := &vm.stack
 	_, err := stack.Pop()
 	return err
+}
+
+func (vm *VM) Def() error {
+	word, err := vm.stack.Pop()
+	if err != nil {
+		return err
+	}
+	val, err := vm.stack.Pop()
+	if err != nil {
+		return err
+	}
+	vm.dictionary[word.Val.(string)] = val
+	return nil
 }

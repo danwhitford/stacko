@@ -22,13 +22,13 @@ func (stack *Stack[T]) Pop() (T, error) {
 	return v, nil
 }
 
-func (stack *Stack[T]) Peek() (T, error) {
+func (stack *Stack[T]) Peek() (*T, error) {
 	l := len(*stack)
 	if l < 1 {
 		var t T
-		return t, fmt.Errorf("stack underflow")
+		return &t, fmt.Errorf("stack underflow")
 	}
-	return (*stack)[l-1], nil
+	return &(*stack)[l-1], nil
 }
 
 func (stack *Stack[T]) Empty() bool {

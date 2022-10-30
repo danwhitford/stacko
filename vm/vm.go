@@ -8,14 +8,14 @@ import (
 )
 
 type VM struct {
-	dictionary   map[string][]stackoval.StackoVal
+	dictionary   map[string]stackoval.StackoVal
 	instructions stack.Stack[InstructionFrame]
 	stack        stack.Stack[stackoval.StackoVal]
 }
 
 func NewVM() VM {
 	return VM{
-		make(map[string][]stackoval.StackoVal, 0),
+		make(map[string]stackoval.StackoVal, 0),
 		make(stack.Stack[InstructionFrame], 0),
 		make(stack.Stack[stackoval.StackoVal], 0)}
 }
@@ -31,25 +31,61 @@ func (vm *VM) Load(extras []stackoval.StackoVal) {
 
 func (vm *VM) Execute() error {
 	for !vm.instructions.Empty() {
-		currentFrame, err := vm.instructions.Pop()
+		err := vm.executeInstructionFrame()
 		if err != nil {
 			return err
-		}
-		for currentFrame.InstructionPointer < currentFrame.Length {
-			switch curr := currentFrame.Instructions[currentFrame.InstructionPointer]; curr.StackoType {
-			case stackoval.StackoWord:
-				execd, err := vm.execBuiltin(curr.Val.(string))
-				if err != nil {
-					return fmt.Errorf("error while executing %v: %w", curr, err)
-				}
-				if !execd {
-					return fmt.Errorf("couldn't find definition for word: %s", curr.Val)
-				}
-			default:
-				vm.stack.Push(curr)
-			}
-			currentFrame.InstructionPointer++
 		}
 	}
 	return nil
 }
+
+func (vm *VM) executeInstructionFrame() error {
+	currentFrame, err := vm.instructions.Peek()
+	if err != nil {
+		return err
+	}
+
+	for currentFrame.InstructionPointer < currentFrame.Length {
+		switch curr := currentFrame.Instructions[currentFrame.InstructionPointer]; curr.StackoType {
+		case stackoval.StackoWord:
+			execd, err := vm.execBuiltin(curr.Val.(string))
+			if err != nil {
+				return fmt.Errorf("error while executing %v: %w", curr, err)
+			}
+			if !execd {
+				userWord, prs := vm.dictionary[curr.Val.(string)]
+				if !prs {
+					return fmt.Errorf("couldn't find definition for word: %s", curr.Val)
+				}
+				switch userWord.StackoType {
+				case stackoval.StackoList:
+					frame := InstructionFrame{
+						userWord.Val.([]stackoval.StackoVal),
+						len(userWord.Val.([]stackoval.StackoVal)),
+						0,
+					}
+					currentFrame.InstructionPointer++
+					vm.instructions.Push(frame)
+				default:
+					frame := InstructionFrame{
+						[]stackoval.StackoVal{userWord},
+						1,
+						0,
+					}
+					currentFrame.InstructionPointer++
+					vm.instructions.Push(frame)
+				}
+				return nil
+			}
+		default:
+			vm.stack.Push(curr)
+		}
+
+		currentFrame.InstructionPointer++
+	}
+
+	vm.instructions.Pop()
+	return nil
+}
+
+

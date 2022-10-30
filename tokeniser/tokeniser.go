@@ -17,6 +17,7 @@ const (
 	Tword
 	TLSqB
 	TRSqB
+	Tsymbol
 )
 
 type Token struct {
@@ -71,6 +72,12 @@ func (t Tokeniser) Tokenise() ([]Token, error) {
 				token := Token{TRSqB, "]", "]"}
 				tokens = append(tokens, token)
 			}
+		case (curr == '\''):
+			token, err := t.readSymbol()
+			if err != nil {
+				return tokens, err
+			}
+			tokens = append(tokens, token)
 		default:
 			{
 				token, err := t.readWord()
@@ -85,6 +92,21 @@ func (t Tokeniser) Tokenise() ([]Token, error) {
 	}
 
 	return tokens, nil
+}
+
+func (t *Tokeniser) readSymbol() (Token, error) {
+	t.current++ // Eat the opening quote
+	var sb strings.Builder
+	for t.current < t.len {
+		curr := t.src[t.current]
+		if unicode.IsSpace(curr) || curr == ']' {
+			t.current-- // Put back so curr is processed in main loop
+			return Token{Tsymbol, sb.String(), fmt.Sprintf("'%s", sb.String())}, nil
+		}
+		sb.WriteRune(curr)
+		t.current++
+	}
+	return Token{Tsymbol, sb.String(), fmt.Sprintf("'%s", sb.String())}, nil
 }
 
 func (t *Tokeniser) readWord() (Token, error) {

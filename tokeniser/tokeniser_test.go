@@ -162,3 +162,19 @@ func TestList(t *testing.T) {
 	}
 	testTable(t, table)
 }
+
+func TestSymbols(t *testing.T) {
+	table := []struct {
+		in  string
+		out []Token
+	}{
+		{in: "'foo 'bar",
+			out: []Token{
+				{Tsymbol, "foo", "'foo"},
+				{Tsymbol, "bar", "'bar"},
+			},
+		},
+	}
+
+	testTable(t, table)
+}
