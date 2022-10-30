@@ -4,56 +4,52 @@ import (
 	"fmt"
 
 	"github.com/danwhitford/stacko/stack"
+	"github.com/danwhitford/stacko/stackoval"
 )
 
 type VM struct {
-	builtins       map[string]func(*stack.Stack) error
-	dictionary     map[string]stack.StackoVal
-	instructions   []stack.StackoVal
-	instructionPtr int
-	len            int
-	stack          stack.Stack
+	dictionary   map[string][]stackoval.StackoVal
+	instructions stack.Stack[InstructionFrame]
+	stack        stack.Stack[stackoval.StackoVal]
 }
 
 func NewVM() VM {
 	return VM{
-		builtins,
-		make(map[string]stack.StackoVal),
-		make([]stack.StackoVal, 0),
-		0,
-		0,
-		make(stack.Stack, 0)}
+		make(map[string][]stackoval.StackoVal, 0),
+		make(stack.Stack[InstructionFrame], 0),
+		make(stack.Stack[stackoval.StackoVal], 0)}
 }
 
-func (vm *VM) Load(extras []stack.StackoVal) {
-	vm.instructions = append(vm.instructions, extras...)
-	vm.len += len(extras)
+func (vm *VM) Load(extras []stackoval.StackoVal) {
+	frame := InstructionFrame{
+		Instructions:       extras,
+		Length:             len(extras),
+		InstructionPointer: 0,
+	}
+	vm.instructions.Push(frame)
 }
 
 func (vm *VM) Execute() error {
-	for vm.instructionPtr < vm.len {
-		switch curr := vm.instructions[vm.instructionPtr]; curr.StackoType {
-		case stack.StackoWord:
-			execd, err := vm.execBuiltin()
-			if err != nil {
-				return fmt.Errorf("error while executing %v: %w", curr, err)
-			}
-			if !execd {
-				f, ok := vm.builtins[curr.Val.(string)]
-				if !ok {
-					vm.instructionPtr++
-					return fmt.Errorf("could not find word in dict: %s", curr.Val)
-				}
-				err := f(&vm.stack)
+	for !vm.instructions.Empty() {
+		currentFrame, err := vm.instructions.Pop()
+		if err != nil {
+			return err
+		}
+		for currentFrame.InstructionPointer < currentFrame.Length {
+			switch curr := currentFrame.Instructions[currentFrame.InstructionPointer]; curr.StackoType {
+			case stackoval.StackoWord:
+				execd, err := vm.execBuiltin(curr.Val.(string))
 				if err != nil {
-					vm.instructionPtr++
 					return fmt.Errorf("error while executing %v: %w", curr, err)
 				}
+				if !execd {
+					return fmt.Errorf("couldn't find definition for word: %s", curr.Val)
+				}
+			default:
+				vm.stack.Push(curr)
 			}
-		default:
-			vm.stack.Push(curr)
+			currentFrame.InstructionPointer++
 		}
-		vm.instructionPtr++
 	}
 	return nil
 }

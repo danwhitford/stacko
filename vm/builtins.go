@@ -4,8 +4,6 @@ package vm
 
 import (
 	"fmt"
-
-	"github.com/danwhitford/stacko/stack"
 )
 
 func (vm *VM) PrintTop() error {
@@ -34,8 +32,8 @@ func (vm *VM) Dup() error {
 	return nil
 }
 
-func (vm *VM) execBuiltin() (bool, error) {
-	switch vm.instructions[vm.instructionPtr].Val.(string) {
+func (vm *VM) execBuiltin(word string) (bool, error) {
+	switch word {
 	case "+":
 		return true, vm.Add()
 	case "-":
@@ -52,59 +50,72 @@ func (vm *VM) execBuiltin() (bool, error) {
 		return true, vm.PrintStack()
 	case "dup":
 		return true, vm.Dup()
+	case "swap":
+		return true, vm.Swap()
+	case "over":
+		return true, vm.Over()
+	case "rot":
+		return true, vm.Rot()
+	case "drop":
+		return true, vm.Drop()
 	default:
 		return false, nil
 	}
 }
 
-var builtins = map[string]func(*stack.Stack) error{
-	"swap": func(stack *stack.Stack) error {
-		a, err := stack.Pop()
-		if err != nil {
-			return err
-		}
-		b, err := stack.Pop()
-		if err != nil {
-			return err
-		}
-		stack.Push(a)
-		stack.Push(b)
-		return nil
-	},
-	"over": func(stack *stack.Stack) error {
-		a, err := stack.Pop()
-		if err != nil {
-			return err
-		}
-		b, err := stack.Pop()
-		if err != nil {
-			return err
-		}
-		stack.Push(b)
-		stack.Push(a)
-		stack.Push(b)
-		return nil
-	},
-	"rot": func(stack *stack.Stack) error {
-		a, err := stack.Pop()
-		if err != nil {
-			return err
-		}
-		b, err := stack.Pop()
-		if err != nil {
-			return err
-		}
-		c, err := stack.Pop()
-		if err != nil {
-			return err
-		}
-		stack.Push(b)
-		stack.Push(a)
-		stack.Push(c)
-		return nil
-	},
-	"drop": func(stack *stack.Stack) error {
-		_, err := stack.Pop()
+func (vm *VM) Swap() error {
+	stack := &vm.stack
+	a, err := stack.Pop()
+	if err != nil {
 		return err
-	},
+	}
+	b, err := stack.Pop()
+	if err != nil {
+		return err
+	}
+	stack.Push(a)
+	stack.Push(b)
+	return nil
+}
+
+func (vm *VM) Over() error {
+	stack := &vm.stack
+	a, err := stack.Pop()
+	if err != nil {
+		return err
+	}
+	b, err := stack.Pop()
+	if err != nil {
+		return err
+	}
+	stack.Push(b)
+	stack.Push(a)
+	stack.Push(b)
+	return nil
+}
+
+func (vm *VM) Rot() error {
+	stack := &vm.stack
+	a, err := stack.Pop()
+	if err != nil {
+		return err
+	}
+	b, err := stack.Pop()
+	if err != nil {
+		return err
+	}
+	c, err := stack.Pop()
+	if err != nil {
+		return err
+	}
+	stack.Push(b)
+	stack.Push(a)
+	stack.Push(c)
+	return nil
+}
+
+func (vm *VM) Drop() error {
+	stack := &vm.stack
+	_, err := stack.Pop()
+	return err
 }

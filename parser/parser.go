@@ -3,7 +3,7 @@ package parser
 import (
 	"fmt"
 
-	"github.com/danwhitford/stacko/stack"
+	"github.com/danwhitford/stacko/stackoval"
 	"github.com/danwhitford/stacko/tokeniser"
 )
 
@@ -17,8 +17,8 @@ func NewParser(tokens []tokeniser.Token) Parser {
 	return Parser{tokens, 0, len(tokens)}
 }
 
-func (parser Parser) Parse() ([]stack.StackoVal, error) {
-	stackos := make([]stack.StackoVal, 0)
+func (parser Parser) Parse() ([]stackoval.StackoVal, error) {
+	stackos := make([]stackoval.StackoVal, 0)
 
 	for parser.current < parser.len {
 		thing, err := parser.parseToken()
@@ -32,40 +32,40 @@ func (parser Parser) Parse() ([]stack.StackoVal, error) {
 	return stackos, nil
 }
 
-func (parser *Parser) parseToken() (stack.StackoVal, error) {
+func (parser *Parser) parseToken() (stackoval.StackoVal, error) {
 	curr := parser.tokens[parser.current]
 
 	switch curr.TT {
 	case tokeniser.Tword:
-		return stack.StackoVal{StackoType: stack.StackoWord, Val: curr.V}, nil
+		return stackoval.StackoVal{StackoType: stackoval.StackoWord, Val: curr.V}, nil
 	case tokeniser.Tfloat:
-		return stack.StackoVal{StackoType: stack.StackoFloat, Val: curr.V}, nil
+		return stackoval.StackoVal{StackoType: stackoval.StackoFloat, Val: curr.V}, nil
 	case tokeniser.Tstring:
-		return stack.StackoVal{StackoType: stack.StackoString, Val: curr.V}, nil
+		return stackoval.StackoVal{StackoType: stackoval.StackoString, Val: curr.V}, nil
 	case tokeniser.Tint:
-		return stack.StackoVal{StackoType: stack.StackoInt, Val: curr.V}, nil
+		return stackoval.StackoVal{StackoType: stackoval.StackoInt, Val: curr.V}, nil
 	case tokeniser.TLSqB:
 		return parser.readList()
 	default:
-		return stack.StackoVal{}, fmt.Errorf("unrecognised token type: %+v", curr)
+		return stackoval.StackoVal{}, fmt.Errorf("unrecognised token type: %+v", curr)
 	}
 }
 
-func (parser *Parser) readList() (stack.StackoVal, error) {
-	listEls := make([]stack.StackoVal, 0)
+func (parser *Parser) readList() (stackoval.StackoVal, error) {
+	listEls := make([]stackoval.StackoVal, 0)
 	parser.current++ // Eat the opening '['
 	for parser.current < parser.len {
 		curr := parser.tokens[parser.current]
 		if curr.TT == tokeniser.TRSqB {
-			return stack.StackoVal{StackoType: stack.StackoList, Val: listEls}, nil
+			return stackoval.StackoVal{StackoType: stackoval.StackoList, Val: listEls}, nil
 		}
 		thing, err := parser.parseToken()
 		if err != nil {
-			return stack.StackoVal{}, err
+			return stackoval.StackoVal{}, err
 		}
 		listEls = append(listEls, thing)
 		parser.current++
 	}
 
-	return stack.StackoVal{}, fmt.Errorf("unexpected end of input while parsing list")
+	return stackoval.StackoVal{}, fmt.Errorf("unexpected end of input while parsing list")
 }
