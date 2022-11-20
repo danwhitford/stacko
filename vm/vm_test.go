@@ -194,3 +194,20 @@ func ExampleDefVar() {
 	// Output:
 	// 10
 }
+
+func ExamplePrintTop() {
+	vm := NewVM()
+	vm.Load([]stackoval.StackoVal{
+			{StackoType: stackoval.StackoInt, Val: 100},
+			{StackoType: stackoval.StackoInt, Val: 20},
+			{StackoType: stackoval.StackoWord, Val: "/"},
+			{StackoType: stackoval.StackoWord, Val: "."},
+			
+	})
+	err := vm.Execute()
+	if err != nil {
+		fmt.Println(err)
+	}
+	// Output:
+	// 5
+}

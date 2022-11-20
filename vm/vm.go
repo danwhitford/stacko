@@ -50,11 +50,13 @@ func (vm *VM) executeInstructionFrame() error {
 		case stackoval.StackoWord:
 			execd, err := vm.execBuiltin(curr.Val.(string))
 			if err != nil {
+				currentFrame.InstructionPointer++
 				return fmt.Errorf("error while executing %v: %w", curr, err)
 			}
 			if !execd {
 				userWord, prs := vm.dictionary[curr.Val.(string)]
 				if !prs {
+					currentFrame.InstructionPointer++
 					return fmt.Errorf("couldn't find definition for word: %s", curr.Val)
 				}
 				switch userWord.StackoType {
