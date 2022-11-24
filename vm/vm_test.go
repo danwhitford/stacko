@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/danwhitford/stacko/stackoval"
+	"github.com/google/go-cmp/cmp"
 )
 
 func TestMaths(t *testing.T) {
@@ -211,7 +212,6 @@ func ExamplePrintTop() {
 }
 
 func TestIfStuff(t *testing.T) {
-	vm := NewVM()
 	table := []struct {
 		in  []stackoval.StackoVal
 		out stackoval.StackoVal
@@ -222,11 +222,42 @@ func TestIfStuff(t *testing.T) {
 			{StackoType: stackoval.StackoString, Val: "no"},
 			{StackoType: stackoval.StackoWord, Val: "if"},
 		},
-			out: stackoval.StackoVal{StackoType: stackoval.StackoInt, Val: "yes"},
+			out: stackoval.StackoVal{StackoType: stackoval.StackoString, Val: "yes"},
+		},
+		{in: []stackoval.StackoVal{
+			{StackoType: stackoval.StackoBool, Val: false},
+			{StackoType: stackoval.StackoList, Val: []stackoval.StackoVal{
+				{StackoType: stackoval.StackoInt, Val: 10},
+				{StackoType: stackoval.StackoInt, Val: 5},
+				{StackoType: stackoval.StackoWord, Val: "*"},
+			}},
+			{StackoType: stackoval.StackoList, Val: []stackoval.StackoVal{
+				{StackoType: stackoval.StackoInt, Val: 10},
+				{StackoType: stackoval.StackoInt, Val: 5},
+				{StackoType: stackoval.StackoWord, Val: "+"},
+			}},
+			{StackoType: stackoval.StackoWord, Val: "if"},
+		},
+			out: stackoval.StackoVal{StackoType: stackoval.StackoInt, Val: 15},
+		},
+		{in: []stackoval.StackoVal{
+			{StackoType: stackoval.StackoInt, Val: 10},
+			{StackoType: stackoval.StackoInt, Val: 10},
+			{StackoType: stackoval.StackoBool, Val: false},
+			{StackoType: stackoval.StackoList, Val: []stackoval.StackoVal{
+				{StackoType: stackoval.StackoWord, Val: "*"},
+			}},
+			{StackoType: stackoval.StackoList, Val: []stackoval.StackoVal{
+				{StackoType: stackoval.StackoWord, Val: "+"},
+			}},
+			{StackoType: stackoval.StackoWord, Val: "if"},
+		},
+			out: stackoval.StackoVal{StackoType: stackoval.StackoInt, Val: 20},
 		},
 	}
 
 	for _, test := range table {
+		vm := NewVM()
 		vm.Load(test.in)
 		err := vm.Execute()
 		if err != nil {
@@ -236,8 +267,9 @@ func TestIfStuff(t *testing.T) {
 		if err != nil {
 			t.Error(err)
 		}
-		if *top != test.out {
-			t.Errorf("wanted %v got %v", test.out, top)
+		diff := cmp.Diff(test.out, *top)
+		if diff != "" {
+			t.Errorf("(-want +got):\n%s", diff)
 		}
 	}
 }

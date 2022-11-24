@@ -73,6 +73,16 @@ func (vm *VM) execBuiltin(word string) (bool, error) {
 	}
 }
 
+func listise(val stackoval.StackoVal) []stackoval.StackoVal {	
+	switch val.StackoType {
+	case stackoval.StackoList:
+		casted := val.Val.([]stackoval.StackoVal)		
+		return casted
+	default:
+		return []stackoval.StackoVal{val}
+	}
+}
+
 func (vm *VM) If() error {
 	stack := &vm.stack
 
@@ -95,7 +105,7 @@ func (vm *VM) If() error {
 		branch = falseBranch
 	}
 
-	next := []stackoval.StackoVal{branch}
+	next := listise(branch)
 	vm.Load(next)
 	return &DoNotPop{}
 }

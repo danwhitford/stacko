@@ -58,7 +58,7 @@ func (vm *VM) executeInstructionFrame() error {
 			if err != nil {
 				currentFrame.InstructionPointer++
 				if _, ok := err.(*DoNotPop); ok {
-					currentFrame.InstructionPointer = 1000
+					currentFrame.InstructionPointer++
 					vm.instructions.Swap()
 					vm.instructions.Pop()
 					vm.instructions.Push(*currentFrame)
