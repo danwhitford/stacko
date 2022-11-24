@@ -36,70 +36,63 @@ func (vm *VM) Load(extras []stackoval.StackoVal) {
 
 func (vm *VM) Execute() error {
 	for !vm.instructions.Empty() {
-		err := vm.executeInstructionFrame()
+		instruction, err := vm.getNextInstruction()
 		if err != nil {
 			return err
+		}
+		err = vm.executeInstruction(instruction)
+		if err != nil {
+				return err		
 		}
 	}
 	return nil
 }
 
-func (vm *VM) executeInstructionFrame() error {
-	currentFrame, err := vm.instructions.Peek()
-
+func (vm *VM) getNextInstruction() (stackoval.StackoVal, error) {
+	top, err := vm.instructions.Peek()
 	if err != nil {
-		return err
+		return stackoval.StackoVal{}, fmt.Errorf("error getting next instruction: %w", err)
 	}
+	instruction := top.Instructions[top.InstructionPointer]
+	top.Advance()
+	if top.InstructionPointer >= top.Length {
+		vm.instructions.Pop()
+	}
+	return instruction, nil
+}
 
-	for currentFrame.InstructionPointer < currentFrame.Length {
-		switch curr := currentFrame.Instructions[currentFrame.InstructionPointer]; curr.StackoType {
-		case stackoval.StackoWord:
-			execd, err := vm.execBuiltin(curr.Val.(string))
-			if err != nil {
-				currentFrame.InstructionPointer++
-				if _, ok := err.(*DoNotPop); ok {
-					currentFrame.InstructionPointer++
-					vm.instructions.Swap()
-					vm.instructions.Pop()
-					vm.instructions.Push(*currentFrame)
-					vm.instructions.Swap()
-					return nil
-				}
-				return fmt.Errorf("error while executing '%v': %w", curr, err)
-			}
-			if !execd {
-				userWord, prs := vm.dictionary[curr.Val.(string)]
-				if !prs {
-					currentFrame.InstructionPointer++
-					return fmt.Errorf("couldn't find definition for word: %s", curr.Val)
-				}
-				switch userWord.StackoType {
-				case stackoval.StackoList:
-					frame := InstructionFrame{
-						userWord.Val.([]stackoval.StackoVal),
-						len(userWord.Val.([]stackoval.StackoVal)),
-						0,
-					}
-					currentFrame.InstructionPointer++
-					vm.instructions.Push(frame)
-				default:
-					frame := InstructionFrame{
-						[]stackoval.StackoVal{userWord},
-						1,
-						0,
-					}
-					currentFrame.InstructionPointer++
-					vm.instructions.Push(frame)
-				}
-				return nil
-			}
-		default:
-			vm.stack.Push(curr)
+func (vm *VM) executeInstruction(curr stackoval.StackoVal) error {
+	switch curr.StackoType {
+	case stackoval.StackoWord:
+		execd, err := vm.execBuiltin(curr.Val.(string))
+		if err != nil {
+			return fmt.Errorf("error while executing '%v': %w", curr, err)
 		}
-
-		currentFrame.InstructionPointer++
+		if !execd {
+			userWord, prs := vm.dictionary[curr.Val.(string)]
+			if !prs {
+				return fmt.Errorf("couldn't find definition for word: %s", curr.Val)
+			}
+			switch userWord.StackoType {
+			case stackoval.StackoList:
+				frame := InstructionFrame{
+					userWord.Val.([]stackoval.StackoVal),
+					len(userWord.Val.([]stackoval.StackoVal)),
+					0,
+				}
+				vm.instructions.Push(frame)
+			default:
+				frame := InstructionFrame{
+					[]stackoval.StackoVal{userWord},
+					1,
+					0,
+				}
+				vm.instructions.Push(frame)
+			}
+			return nil
+		}
+	default:
+		vm.stack.Push(curr)
 	}
-
-	vm.instructions.Pop()
 	return nil
 }

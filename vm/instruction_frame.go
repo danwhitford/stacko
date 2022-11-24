@@ -9,3 +9,8 @@ type InstructionFrame struct {
 	Length             int
 	InstructionPointer int
 }
+
+func (frame *InstructionFrame) Advance() error {
+	frame.InstructionPointer++
+	return nil
+}

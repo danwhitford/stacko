@@ -107,7 +107,7 @@ func (vm *VM) If() error {
 
 	next := listise(branch)
 	vm.Load(next)
-	return &DoNotPop{}
+	return nil
 }
 
 func (vm *VM) Dbg() error {
