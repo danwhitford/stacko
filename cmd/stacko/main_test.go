@@ -22,7 +22,7 @@ func run(t *testing.T, in string, out string) {
 	}
 	diff := cmp.Diff(out, strings.TrimSpace(string(b)))
 	if diff != "" {
-		t.Errorf("mismatch (-want +got):\n%s", diff)
+		t.Errorf("failed input '%s'\nmismatch (-want +got):\n%s", in, diff)
 	}
 }
 
