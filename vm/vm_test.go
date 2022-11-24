@@ -178,14 +178,13 @@ func ExampleVM_PrintStack() {
 func ExampleDefVar() {
 	vm := NewVM()
 	vm.Load([]stackoval.StackoVal{
-			{StackoType: stackoval.StackoInt, Val: 5},
-			{StackoType: stackoval.StackoSymbol, Val: "foo"},
-			{StackoType: stackoval.StackoWord, Val: "def"},
-			{StackoType: stackoval.StackoWord, Val: "foo"},
-			{StackoType: stackoval.StackoWord, Val: "foo"},
-			{StackoType: stackoval.StackoWord, Val: "+"},
-			{StackoType: stackoval.StackoWord, Val: "v"},
-			
+		{StackoType: stackoval.StackoInt, Val: 5},
+		{StackoType: stackoval.StackoSymbol, Val: "foo"},
+		{StackoType: stackoval.StackoWord, Val: "def"},
+		{StackoType: stackoval.StackoWord, Val: "foo"},
+		{StackoType: stackoval.StackoWord, Val: "foo"},
+		{StackoType: stackoval.StackoWord, Val: "+"},
+		{StackoType: stackoval.StackoWord, Val: "v"},
 	})
 	err := vm.Execute()
 	if err != nil {
@@ -198,11 +197,10 @@ func ExampleDefVar() {
 func ExamplePrintTop() {
 	vm := NewVM()
 	vm.Load([]stackoval.StackoVal{
-			{StackoType: stackoval.StackoInt, Val: 100},
-			{StackoType: stackoval.StackoInt, Val: 20},
-			{StackoType: stackoval.StackoWord, Val: "/"},
-			{StackoType: stackoval.StackoWord, Val: "."},
-			
+		{StackoType: stackoval.StackoInt, Val: 100},
+		{StackoType: stackoval.StackoInt, Val: 20},
+		{StackoType: stackoval.StackoWord, Val: "/"},
+		{StackoType: stackoval.StackoWord, Val: "."},
 	})
 	err := vm.Execute()
 	if err != nil {
@@ -210,4 +208,36 @@ func ExamplePrintTop() {
 	}
 	// Output:
 	// 5
+}
+
+func TestIfStuff(t *testing.T) {
+	vm := NewVM()
+	table := []struct {
+		in  []stackoval.StackoVal
+		out stackoval.StackoVal
+	}{
+		{in: []stackoval.StackoVal{
+			{StackoType: stackoval.StackoBool, Val: true},
+			{StackoType: stackoval.StackoString, Val: "yes"},
+			{StackoType: stackoval.StackoString, Val: "no"},
+			{StackoType: stackoval.StackoWord, Val: "if"},
+		},
+			out: stackoval.StackoVal{StackoType: stackoval.StackoInt, Val: "yes"},
+		},
+	}
+
+	for _, test := range table {
+		vm.Load(test.in)
+		err := vm.Execute()
+		if err != nil {
+			t.Error(err)
+		}
+		top, err := vm.stack.Peek()
+		if err != nil {
+			t.Error(err)
+		}
+		if *top != test.out {
+			t.Errorf("wanted %v got %v", test.out, top)
+		}
+	}
 }

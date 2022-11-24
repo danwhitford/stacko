@@ -14,9 +14,14 @@ type VM struct {
 }
 
 func NewVM() VM {
+	dictionary := map[string]stackoval.StackoVal{
+		"true": {StackoType: stackoval.StackoBool, Val: true},
+	}
+	instructions := make(stack.Stack[InstructionFrame], 0)
+
 	return VM{
-		make(map[string]stackoval.StackoVal, 0),
-		make(stack.Stack[InstructionFrame], 0),
+		dictionary,
+		instructions,
 		make(stack.Stack[stackoval.StackoVal], 0)}
 }
 
@@ -41,6 +46,7 @@ func (vm *VM) Execute() error {
 
 func (vm *VM) executeInstructionFrame() error {
 	currentFrame, err := vm.instructions.Peek()
+
 	if err != nil {
 		return err
 	}
@@ -51,7 +57,15 @@ func (vm *VM) executeInstructionFrame() error {
 			execd, err := vm.execBuiltin(curr.Val.(string))
 			if err != nil {
 				currentFrame.InstructionPointer++
-				return fmt.Errorf("error while executing %v: %w", curr, err)
+				if _, ok := err.(*DoNotPop); ok {
+					currentFrame.InstructionPointer = 1000
+					vm.instructions.Swap()
+					vm.instructions.Pop()
+					vm.instructions.Push(*currentFrame)
+					vm.instructions.Swap()
+					return nil
+				}
+				return fmt.Errorf("error while executing '%v': %w", curr, err)
 			}
 			if !execd {
 				userWord, prs := vm.dictionary[curr.Val.(string)]
@@ -89,5 +103,3 @@ func (vm *VM) executeInstructionFrame() error {
 	vm.instructions.Pop()
 	return nil
 }
-
-

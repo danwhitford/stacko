@@ -11,7 +11,7 @@ import (
 const tmpl string = `
 package vm
 
-import 	"github.com/danwhitford/stacko/stack"
+import 	"github.com/danwhitford/stacko/stackoval"
 
 {{ range . }}
 func (vm *VM) {{ .Name }}() error {
@@ -25,21 +25,21 @@ func (vm *VM) {{ .Name }}() error {
 	}
 
 	switch {
-	case a.StackoType == stack.StackoInt && b.StackoType == stack.StackoInt:
-		vm.stack.Push(stack.StackoVal{StackoType: stack.StackoInt, Val: b.Val.(int) {{ .Op }} a.Val.(int)})
+	case a.StackoType == stackoval.StackoInt && b.StackoType == stackoval.StackoInt:
+		vm.stack.Push(stackoval.StackoVal{StackoType: stackoval.StackoInt, Val: b.Val.(int) {{ .Op }} a.Val.(int)})
 {{ if not .IntOnly }}
-	case a.StackoType == stack.StackoInt && b.StackoType == stack.StackoFloat:
+	case a.StackoType == stackoval.StackoInt && b.StackoType == stackoval.StackoFloat:
 		aa := float64(a.Val.(int))
 		bb := b.Val.(float64)
-		vm.stack.Push(stack.StackoVal{StackoType: stack.StackoFloat, Val: bb {{ .Op }} aa})
-	case a.StackoType == stack.StackoFloat && b.StackoType == stack.StackoInt:
+		vm.stack.Push(stackoval.StackoVal{StackoType: stackoval.StackoFloat, Val: bb {{ .Op }} aa})
+	case a.StackoType == stackoval.StackoFloat && b.StackoType == stackoval.StackoInt:
 		aa := a.Val.(float64)
 		bb := float64(b.Val.(int))
-		vm.stack.Push(stack.StackoVal{StackoType: stack.StackoFloat, Val: bb {{ .Op }} aa})
-	case a.StackoType == stack.StackoFloat && b.StackoType == stack.StackoFloat:
+		vm.stack.Push(stackoval.StackoVal{StackoType: stackoval.StackoFloat, Val: bb {{ .Op }} aa})
+	case a.StackoType == stackoval.StackoFloat && b.StackoType == stackoval.StackoFloat:
 		aa := a.Val.(float64)
 		bb := b.Val.(float64)
-		vm.stack.Push(stack.StackoVal{StackoType: stack.StackoFloat, Val: bb {{ .Op }} aa})
+		vm.stack.Push(stackoval.StackoVal{StackoType: stackoval.StackoFloat, Val: bb {{ .Op }} aa})
 {{ end }}
 	}
 	return nil
@@ -73,6 +73,10 @@ func main() {
 			Name:    "Mod",
 			Op:      "%",
 			IntOnly: true,
+		},
+		{
+			Name: "Eq",
+			Op:   "==",
 		},
 	}
 

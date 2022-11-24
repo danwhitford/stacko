@@ -4,6 +4,8 @@ package vm
 
 import (
 	"fmt"
+
+	"github.com/danwhitford/stacko/stackoval"
 )
 
 func (vm *VM) PrintTop() error {
@@ -62,9 +64,40 @@ func (vm *VM) execBuiltin(word string) (bool, error) {
 		return true, vm.Def()
 	case "dbg":
 		return true, vm.Dbg()
+	case "=":
+		return true, vm.Eq()
+	case "if":
+		return true, vm.If()
 	default:
 		return false, nil
 	}
+}
+
+func (vm *VM) If() error {
+	stack := &vm.stack
+
+	falseBranch, err := stack.Pop()
+	if err != nil {
+		return fmt.Errorf("error getting false branch: %w", err)
+	}
+	trueBranch, err := stack.Pop()
+	if err != nil {
+		return fmt.Errorf("error getting true branch: %w", err)
+	}
+	condition, err := stack.Pop()
+	if err != nil {
+		return fmt.Errorf("error getting condition: %w", err)
+	}
+	var branch stackoval.StackoVal
+	if condition.Val == true {
+		branch = trueBranch
+	} else {
+		branch = falseBranch
+	}
+
+	next := []stackoval.StackoVal{branch}
+	vm.Load(next)
+	return &DoNotPop{}
 }
 
 func (vm *VM) Dbg() error {
