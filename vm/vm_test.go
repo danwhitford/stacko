@@ -258,12 +258,8 @@ func TestIfStuff(t *testing.T) {
 			{StackoType: stackoval.StackoInt, Val: 10},
 			{StackoType: stackoval.StackoInt, Val: 10},
 			{StackoType: stackoval.StackoBool, Val: true},
-			{StackoType: stackoval.StackoList, Val: []stackoval.StackoVal{
-				{StackoType: stackoval.StackoWord, Val: "'*"},
-			}},
-			{StackoType: stackoval.StackoList, Val: []stackoval.StackoVal{
-				{StackoType: stackoval.StackoWord, Val: "'+"},
-			}},
+			{StackoType: stackoval.StackoSymbol, Val: "*"},
+			{StackoType: stackoval.StackoSymbol, Val: "+"},
 			{StackoType: stackoval.StackoWord, Val: "if"},
 		},
 			out: stackoval.StackoVal{StackoType: stackoval.StackoInt, Val: 100},
