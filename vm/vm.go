@@ -2,6 +2,7 @@ package vm
 
 import (
 	"fmt"
+	"io"
 
 	"github.com/danwhitford/stacko/stack"
 	"github.com/danwhitford/stacko/stackoval"
@@ -11,9 +12,10 @@ type VM struct {
 	dictionary   map[string]stackoval.StackoVal
 	instructions stack.Stack[InstructionFrame]
 	stack        stack.Stack[stackoval.StackoVal]
+	outF         io.Writer
 }
 
-func NewVM() VM {
+func NewVM(r io.Writer) VM {
 	dictionary := map[string]stackoval.StackoVal{
 		"true": {StackoType: stackoval.StackoBool, Val: true},
 	}
@@ -22,7 +24,8 @@ func NewVM() VM {
 	return VM{
 		dictionary,
 		instructions,
-		make(stack.Stack[stackoval.StackoVal], 0)}
+		make(stack.Stack[stackoval.StackoVal], 0),
+		r}
 }
 
 func (vm *VM) Load(extras []stackoval.StackoVal) {
@@ -38,11 +41,11 @@ func (vm *VM) Execute() error {
 	for !vm.instructions.Empty() {
 		instruction, err := vm.getNextInstruction()
 		if err != nil {
-			return err
+			return fmt.Errorf("error getting next instruction %w", err)
 		}
 		err = vm.executeInstruction(instruction)
 		if err != nil {
-				return err		
+			return fmt.Errorf("error executing instruction %w", err)
 		}
 	}
 	return nil
@@ -56,7 +59,10 @@ func (vm *VM) getNextInstruction() (stackoval.StackoVal, error) {
 	instruction := top.Instructions[top.InstructionPointer]
 	top.Advance()
 	if top.InstructionPointer >= top.Length {
-		vm.instructions.Pop()
+		_, err = vm.instructions.Pop()
+		if err != nil {
+			return stackoval.StackoVal{}, fmt.Errorf("error getting next instruction: %w", err)
+		}
 	}
 	return instruction, nil
 }

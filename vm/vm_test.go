@@ -2,6 +2,7 @@ package vm
 
 import (
 	"fmt"
+	"os"
 	"testing"
 
 	"github.com/danwhitford/stacko/stackoval"
@@ -73,7 +74,7 @@ func TestMaths(t *testing.T) {
 
 	for _, tst := range tests {
 		t.Log(tst)
-		vm := NewVM()
+		vm := NewVM(os.Stdout)
 		vm.Load(tst.input)
 		vm.Execute()
 
@@ -84,7 +85,7 @@ func TestMaths(t *testing.T) {
 }
 
 func ExampleDup() {
-	vm := NewVM()
+	vm := NewVM(os.Stdout)
 	vm.Load([]stackoval.StackoVal{
 		{StackoType: stackoval.StackoInt, Val: 1},
 		{StackoType: stackoval.StackoWord, Val: "dup"},
@@ -97,7 +98,7 @@ func ExampleDup() {
 }
 
 func ExampleSwap() {
-	vm := NewVM()
+	vm := NewVM(os.Stdout)
 	vm.Load([]stackoval.StackoVal{
 		{StackoType: stackoval.StackoInt, Val: 1},
 		{StackoType: stackoval.StackoInt, Val: 2},
@@ -111,7 +112,7 @@ func ExampleSwap() {
 }
 
 func ExampleOver() {
-	vm := NewVM()
+	vm := NewVM(os.Stdout)
 	vm.Load([]stackoval.StackoVal{
 		{StackoType: stackoval.StackoInt, Val: 1},
 		{StackoType: stackoval.StackoInt, Val: 2},
@@ -126,7 +127,7 @@ func ExampleOver() {
 }
 
 func ExampleRot() {
-	vm := NewVM()
+	vm := NewVM(os.Stdout)
 	vm.Load([]stackoval.StackoVal{
 		{StackoType: stackoval.StackoInt, Val: 1},
 		{StackoType: stackoval.StackoInt, Val: 2},
@@ -142,7 +143,7 @@ func ExampleRot() {
 }
 
 func ExampleDrop() {
-	vm := NewVM()
+	vm := NewVM(os.Stdout)
 	vm.Load([]stackoval.StackoVal{
 		{StackoType: stackoval.StackoInt, Val: 1},
 		{StackoType: stackoval.StackoInt, Val: 2},
@@ -155,7 +156,7 @@ func ExampleDrop() {
 }
 
 func ExampleVM_PrintStack() {
-	vm := NewVM()
+	vm := NewVM(os.Stdout)
 	vm.Load([]stackoval.StackoVal{
 		{StackoType: stackoval.StackoList, Val: []stackoval.StackoVal{
 			{StackoType: stackoval.StackoString, Val: "foo"},
@@ -177,7 +178,7 @@ func ExampleVM_PrintStack() {
 }
 
 func ExampleDefVar() {
-	vm := NewVM()
+	vm := NewVM(os.Stdout)
 	vm.Load([]stackoval.StackoVal{
 		{StackoType: stackoval.StackoInt, Val: 5},
 		{StackoType: stackoval.StackoSymbol, Val: "foo"},
@@ -196,7 +197,7 @@ func ExampleDefVar() {
 }
 
 func ExamplePrintTop() {
-	vm := NewVM()
+	vm := NewVM(os.Stdout)
 	vm.Load([]stackoval.StackoVal{
 		{StackoType: stackoval.StackoInt, Val: 100},
 		{StackoType: stackoval.StackoInt, Val: 20},
@@ -267,7 +268,7 @@ func TestIfStuff(t *testing.T) {
 	}
 
 	for _, test := range table {
-		vm := NewVM()
+		vm := NewVM(os.Stdout)
 		vm.Load(test.in)
 		err := vm.Execute()
 		if err != nil {

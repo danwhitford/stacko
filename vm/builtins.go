@@ -13,13 +13,13 @@ func (vm *VM) PrintTop() error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(a)
+	fmt.Fprintln(vm.outF, a)
 	return nil
 }
 
 func (vm *VM) PrintStack() error {
 	for i := len(vm.stack) - 1; i >= 0; i-- {
-		fmt.Println(vm.stack[i])
+		fmt.Fprintln(vm.outF, vm.stack[i])
 	}
 	return nil
 }
@@ -73,10 +73,10 @@ func (vm *VM) execBuiltin(word string) (bool, error) {
 	}
 }
 
-func listise(val stackoval.StackoVal) []stackoval.StackoVal {	
+func listise(val stackoval.StackoVal) []stackoval.StackoVal {
 	switch val.StackoType {
 	case stackoval.StackoList:
-		casted := val.Val.([]stackoval.StackoVal)		
+		casted := val.Val.([]stackoval.StackoVal)
 		return casted
 	case stackoval.StackoSymbol:
 		return []stackoval.StackoVal{{StackoType: stackoval.StackoWord, Val: val.Val}}
@@ -113,7 +113,7 @@ func (vm *VM) If() error {
 }
 
 func (vm *VM) Dbg() error {
-	fmt.Printf("%+v\n", *vm)
+	fmt.Fprintf(vm.outF, "%+v\n", *vm)
 	return nil
 }
 
