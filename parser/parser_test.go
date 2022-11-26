@@ -137,7 +137,6 @@ func TestLists(t *testing.T) {
 	testTable(t, table)
 }
 
-
 func TestFuncs(t *testing.T) {
 	table := []struct {
 		in  []tokeniser.Token

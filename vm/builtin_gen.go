@@ -3,51 +3,13 @@
 package main
 
 import (
+	"io/ioutil"
 	"log"
 	"os"
 	"text/template"
 )
 
-const tmpl string = `
-package vm
-
-import 	"github.com/danwhitford/stacko/stackoval"
-
-{{ range . }}
-func (vm *VM) {{ .Name }}() error {
-	a, err := vm.stack.Pop()
-	if err != nil {
-		return err
-	}
-	b, err := vm.stack.Pop()
-	if err != nil {
-		return err
-	}
-
-	switch {
-	case a.StackoType == stackoval.StackoInt && b.StackoType == stackoval.StackoInt:
-		vm.stack.Push(stackoval.StackoVal{StackoType: stackoval.StackoInt, Val: b.Val.(int) {{ .Op }} a.Val.(int)})
-{{ if not .IntOnly }}
-	case a.StackoType == stackoval.StackoInt && b.StackoType == stackoval.StackoFloat:
-		aa := float64(a.Val.(int))
-		bb := b.Val.(float64)
-		vm.stack.Push(stackoval.StackoVal{StackoType: stackoval.StackoFloat, Val: bb {{ .Op }} aa})
-	case a.StackoType == stackoval.StackoFloat && b.StackoType == stackoval.StackoInt:
-		aa := a.Val.(float64)
-		bb := float64(b.Val.(int))
-		vm.stack.Push(stackoval.StackoVal{StackoType: stackoval.StackoFloat, Val: bb {{ .Op }} aa})
-	case a.StackoType == stackoval.StackoFloat && b.StackoType == stackoval.StackoFloat:
-		aa := a.Val.(float64)
-		bb := b.Val.(float64)
-		vm.stack.Push(stackoval.StackoVal{StackoType: stackoval.StackoFloat, Val: bb {{ .Op }} aa})
-{{ end }}
-	}
-	return nil
-}
-{{end}}
-`
-
-func main() {
+func mathsBuiltins() {
 	var operators = []struct {
 		Name    string
 		Op      string
@@ -74,24 +36,59 @@ func main() {
 			Op:      "%",
 			IntOnly: true,
 		},
+	}
+
+	runTemplate(operators, "templates/maths_builtins.go.tmpl", "maths_builtins.go")
+}
+
+func booleanBuiltins() {
+	var operators = []struct {
+		Name    string
+		Op      string
+	}{
 		{
 			Name: "Eq",
 			Op:   "==",
 		},
+		{
+			Name: "Gt",
+			Op:   ">",
+		},
+		{
+			Name: "Lt",
+			Op:   "<",
+		},
 	}
 
-	t, err := template.New("letter").Parse(tmpl)
+	runTemplate(operators, "templates/boolean_builtins.go.tmpl", "boolean_builtins.go")
+}
+
+func runTemplate(data interface{}, tmplName, outName string) {
+	tmplf, err := os.Open(tmplName)
+	if err != nil {
+		panic(err)
+	}
+	tmpl, err := ioutil.ReadAll(tmplf)
+	if err != nil {
+		panic(err)
+	}
+	t, err := template.New("letter").Parse(string(tmpl))
 	if err != nil {
 		log.Fatal("error executing template:", err)
 	}
 
-	f, err := os.Create("maths_builtins.go")
+	f, err := os.Create(outName)
 	if err != nil {
 		log.Fatal("error executing template:", err)
 	}
 	defer f.Close()
-	err = t.Execute(f, operators)
+	err = t.Execute(f, data)
 	if err != nil {
 		log.Fatal("error executing template:", err)
 	}
+}
+
+func main() {
+	mathsBuiltins()
+	booleanBuiltins()
 }

@@ -35,7 +35,7 @@ func TestMain(t *testing.T) {
 			out: "hello world",
 		},
 		{
-			in:  `( dup 5 = 'dup 'drop if ) 
+			in: `( dup 5 = 'dup 'drop if ) 
 							'foo 
 							def 5 foo 6 foo v`,
 			out: "5\n5",

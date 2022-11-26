@@ -35,17 +35,3 @@ func (stack *Stack[T]) Peek() (*T, error) {
 func (stack *Stack[T]) Empty() bool {
 	return len(*stack) == 0
 }
-
-func (stack *Stack[T]) Swap() error {
-	a, err := stack.Pop()
-	if err != nil {
-		return err
-	}
-	b, err := stack.Pop()
-	if err != nil {
-		return err
-	}
-	stack.Push(a)
-	stack.Push(b)
-	return nil
-}

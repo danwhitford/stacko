@@ -267,6 +267,47 @@ func TestIfStuff(t *testing.T) {
 		},
 	}
 
+	testTable(t, table)
+}
+
+func TestBuiltIns(t *testing.T) {
+	table := []struct {
+		in  []stackoval.StackoVal
+		out stackoval.StackoVal
+	}{
+		{
+			in: []stackoval.StackoVal{
+				{StackoType: stackoval.StackoString, Val: "egg"},
+				{StackoType: stackoval.StackoString, Val: "egg"},
+				{StackoType: stackoval.StackoWord, Val: "="},
+			},
+			out: stackoval.StackoVal{StackoType: stackoval.StackoBool, Val: true},
+		},
+		{
+			in: []stackoval.StackoVal{
+				{StackoType: stackoval.StackoInt, Val: 3},
+				{StackoType: stackoval.StackoInt, Val: 4},
+				{StackoType: stackoval.StackoWord, Val: "<"},
+			},
+			out: stackoval.StackoVal{StackoType: stackoval.StackoBool, Val: true},
+		},
+		{
+			in: []stackoval.StackoVal{
+				{StackoType: stackoval.StackoInt, Val: 3},
+				{StackoType: stackoval.StackoInt, Val: 4},
+				{StackoType: stackoval.StackoWord, Val: ">"},
+			},
+			out: stackoval.StackoVal{StackoType: stackoval.StackoBool, Val: false},
+		},
+	}
+
+	testTable(t, table)
+}
+
+func testTable(t *testing.T, table []struct {
+	in  []stackoval.StackoVal
+	out stackoval.StackoVal
+}) {
 	for _, test := range table {
 		vm := NewVM(os.Stdout)
 		vm.Load(test.in)
@@ -280,7 +321,7 @@ func TestIfStuff(t *testing.T) {
 		}
 		diff := cmp.Diff(test.out, *top)
 		if diff != "" {
-			t.Errorf("(-want +got):\n%s", diff)
+			t.Errorf("failed %s\n(-want +got):\n%s", test.in, diff)
 		}
 	}
 }

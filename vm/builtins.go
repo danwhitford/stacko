@@ -66,6 +66,10 @@ func (vm *VM) execBuiltin(word string) (bool, error) {
 		return true, vm.Dbg()
 	case "=":
 		return true, vm.Eq()
+	case ">":
+		return true, vm.Gt()
+	case "<":
+		return true, vm.Lt()
 	case "if":
 		return true, vm.If()
 	default:
