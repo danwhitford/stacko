@@ -1,6 +1,8 @@
+
 package vm
 
-import "github.com/danwhitford/stacko/stackoval"
+import 	"github.com/danwhitford/stacko/stackoval"
+
 
 func (vm *VM) Add() error {
 	a, err := vm.stack.Pop()
@@ -174,3 +176,4 @@ func (vm *VM) Eq() error {
 	}
 	return nil
 }
+

@@ -75,21 +75,22 @@ func (vm *VM) executeInstruction(curr stackoval.StackoVal) error {
 			return fmt.Errorf("error while executing '%v': %w", curr, err)
 		}
 		if !execd {
-			userWord, prs := vm.dictionary[curr.Val.(string)]
+			// userWord := curr.Val.(string)
+			userWordDef, prs := vm.dictionary[curr.Val.(string)]
 			if !prs {
 				return fmt.Errorf("couldn't find definition for word: %s", curr.Val)
 			}
-			switch userWord.StackoType {
-			case stackoval.StackoList:
+			switch userWordDef.StackoType {
+			case stackoval.StackoFn:
 				frame := InstructionFrame{
-					userWord.Val.([]stackoval.StackoVal),
-					len(userWord.Val.([]stackoval.StackoVal)),
+					userWordDef.Val.([]stackoval.StackoVal),
+					len(userWordDef.Val.([]stackoval.StackoVal)),
 					0,
 				}
 				vm.instructions.Push(frame)
 			default:
 				frame := InstructionFrame{
-					[]stackoval.StackoVal{userWord},
+					[]stackoval.StackoVal{userWordDef},
 					1,
 					0,
 				}

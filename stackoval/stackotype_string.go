@@ -14,11 +14,12 @@ func _() {
 	_ = x[StackoWord-3]
 	_ = x[StackoList-4]
 	_ = x[StackoSymbol-5]
+	_ = x[StackoBool-6]
 }
 
-const _StackoType_name = "StackoStringStackoIntStackoFloatStackoWordStackoListStackoSymbol"
+const _StackoType_name = "StackoStringStackoIntStackoFloatStackoWordStackoListStackoSymbolStackoBool"
 
-var _StackoType_index = [...]uint8{0, 12, 21, 32, 42, 52, 64}
+var _StackoType_index = [...]uint8{0, 12, 21, 32, 42, 52, 64, 74}
 
 func (i StackoType) String() string {
 	if i < 0 || i >= StackoType(len(_StackoType_index)-1) {

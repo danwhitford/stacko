@@ -227,12 +227,12 @@ func TestIfStuff(t *testing.T) {
 		},
 		{in: []stackoval.StackoVal{
 			{StackoType: stackoval.StackoBool, Val: false},
-			{StackoType: stackoval.StackoList, Val: []stackoval.StackoVal{
+			{StackoType: stackoval.StackoFn, Val: []stackoval.StackoVal{
 				{StackoType: stackoval.StackoInt, Val: 10},
 				{StackoType: stackoval.StackoInt, Val: 5},
 				{StackoType: stackoval.StackoWord, Val: "*"},
 			}},
-			{StackoType: stackoval.StackoList, Val: []stackoval.StackoVal{
+			{StackoType: stackoval.StackoFn, Val: []stackoval.StackoVal{
 				{StackoType: stackoval.StackoInt, Val: 10},
 				{StackoType: stackoval.StackoInt, Val: 5},
 				{StackoType: stackoval.StackoWord, Val: "+"},
@@ -245,10 +245,10 @@ func TestIfStuff(t *testing.T) {
 			{StackoType: stackoval.StackoInt, Val: 10},
 			{StackoType: stackoval.StackoInt, Val: 10},
 			{StackoType: stackoval.StackoBool, Val: false},
-			{StackoType: stackoval.StackoList, Val: []stackoval.StackoVal{
+			{StackoType: stackoval.StackoFn, Val: []stackoval.StackoVal{
 				{StackoType: stackoval.StackoWord, Val: "*"},
 			}},
-			{StackoType: stackoval.StackoList, Val: []stackoval.StackoVal{
+			{StackoType: stackoval.StackoFn, Val: []stackoval.StackoVal{
 				{StackoType: stackoval.StackoWord, Val: "+"},
 			}},
 			{StackoType: stackoval.StackoWord, Val: "if"},

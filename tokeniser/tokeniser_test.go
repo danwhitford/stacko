@@ -62,6 +62,10 @@ func TestInts(t *testing.T) {
 			"1 2 3",
 			[]Token{{Tint, 1, "1"}, {Tint, 2, "2"}, {Tint, 3, "3"}},
 		},
+		{
+			"5)",
+			[]Token{{Tint, 5, "5"}, {TRB, ")", ")"}},
+		},
 	}
 	testTable(t, table)
 }
@@ -176,5 +180,60 @@ func TestSymbols(t *testing.T) {
 		},
 	}
 
+	testTable(t, table)
+}
+
+func TestFunc(t *testing.T) {
+	table := []struct {
+		in  string
+		out []Token
+	}{
+		{
+			`( "foo" )`,
+			[]Token{
+				{TLB, "(", "("},
+				{Tstring, "foo", "foo"},
+				{TRB, ")", ")"},
+			},
+		},
+		{
+			`("foo bar")`,
+			[]Token{
+				{TLB, "(", "("},
+				{Tstring, "foo bar", "foo bar"},
+				{TRB, ")", ")"},
+			},
+		},
+		{
+			`("foo" ("bar" "baz"))`,
+			[]Token{
+				{TLB, "(", "("},
+				{Tstring, "foo", "foo"},
+				{TLB, "(", "("},
+				{Tstring, "bar", "bar"},
+				{Tstring, "baz", "baz"},
+				{TRB, ")", ")"},
+				{TRB, ")", ")"},
+			},
+		},
+		{
+			`("foo bar")`,
+			[]Token{
+				{TLB, "(", "("},
+				{Tstring, "foo bar", "foo bar"},
+				{TRB, ")", ")"},
+			},
+		},
+		{
+			`(foo bar baz)`,
+			[]Token{
+				{TLB, "(", "("},
+				{Tword, "foo", "foo"},
+				{Tword, "bar", "bar"},
+				{Tword, "baz", "baz"},
+				{TRB, ")", ")"},
+			},
+		},
+	}
 	testTable(t, table)
 }

@@ -75,7 +75,7 @@ func (vm *VM) execBuiltin(word string) (bool, error) {
 
 func listise(val stackoval.StackoVal) []stackoval.StackoVal {
 	switch val.StackoType {
-	case stackoval.StackoList:
+	case stackoval.StackoFn:
 		casted := val.Val.([]stackoval.StackoVal)
 		return casted
 	case stackoval.StackoSymbol:

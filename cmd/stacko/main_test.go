@@ -35,11 +35,13 @@ func TestMain(t *testing.T) {
 			out: "hello world",
 		},
 		{
-			in:  `[ dup 5 = 'dup 'drop if ] 'foo def 5 foo 6 foo v`,
+			in:  `( dup 5 = 'dup 'drop if ) 
+							'foo 
+							def 5 foo 6 foo v`,
 			out: "5\n5",
 		},
 		{
-			in:  `[ dup 1 = [ dup * ] [ dup 1 - fact * ] if ] 'fact def 5 fact v`,
+			in:  `( dup 1 = ( dup * ) ( dup 1 - fact * ) if ) 'fact def 5 fact v`,
 			out: "120",
 		},
 	}

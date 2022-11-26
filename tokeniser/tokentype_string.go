@@ -15,11 +15,13 @@ func _() {
 	_ = x[TLSqB-4]
 	_ = x[TRSqB-5]
 	_ = x[Tsymbol-6]
+	_ = x[TLB-7]
+	_ = x[TRB-8]
 }
 
-const _TokenType_name = "TstringTintTfloatTwordTLSqBTRSqBTsymbol"
+const _TokenType_name = "TstringTintTfloatTwordTLSqBTRSqBTsymbolTLBTRB"
 
-var _TokenType_index = [...]uint8{0, 7, 11, 17, 22, 27, 32, 39}
+var _TokenType_index = [...]uint8{0, 7, 11, 17, 22, 27, 32, 39, 42, 45}
 
 func (i TokenType) String() string {
 	if i < 0 || i >= TokenType(len(_TokenType_index)-1) {

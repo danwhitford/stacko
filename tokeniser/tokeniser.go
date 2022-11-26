@@ -18,6 +18,8 @@ const (
 	TLSqB
 	TRSqB
 	Tsymbol
+	TLB
+	TRB
 )
 
 type Token struct {
@@ -72,6 +74,16 @@ func (t Tokeniser) Tokenise() ([]Token, error) {
 				token := Token{TRSqB, "]", "]"}
 				tokens = append(tokens, token)
 			}
+		case (curr == '('):
+			{
+				token := Token{TLB, "(", "("}
+				tokens = append(tokens, token)
+			}
+		case (curr == ')'):
+			{
+				token := Token{TRB, ")", ")"}
+				tokens = append(tokens, token)
+			}
 		case (curr == '\''):
 			token, err := t.readSymbol()
 			if err != nil {
@@ -99,7 +111,7 @@ func (t *Tokeniser) readSymbol() (Token, error) {
 	var sb strings.Builder
 	for t.current < t.len {
 		curr := t.src[t.current]
-		if unicode.IsSpace(curr) || curr == ']' {
+		if unicode.IsSpace(curr) || curr == ']' || curr == ')' {
 			t.current-- // Put back so curr is processed in main loop
 			return Token{Tsymbol, sb.String(), fmt.Sprintf("'%s", sb.String())}, nil
 		}
@@ -113,7 +125,7 @@ func (t *Tokeniser) readWord() (Token, error) {
 	var sb strings.Builder
 	for t.current < t.len {
 		curr := t.src[t.current]
-		if unicode.IsSpace(curr) || curr == ']' {
+		if unicode.IsSpace(curr) || curr == ']' || curr == ')' {
 			t.current-- // Put back so curr is processed in main loop
 			return Token{Tword, sb.String(), sb.String()}, nil
 		}
@@ -129,6 +141,9 @@ func (t *Tokeniser) readNumber() (Token, error) {
 	for t.current < t.len {
 		curr := t.src[t.current]
 		if unicode.IsSpace(curr) {
+			return stringToNumberToken(sb.String())
+		} else if curr == ']' || curr == ')' {
+			t.current--
 			return stringToNumberToken(sb.String())
 		}
 		sb.WriteRune(curr)

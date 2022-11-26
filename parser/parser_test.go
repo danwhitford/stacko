@@ -14,6 +14,7 @@ func testTable(t *testing.T, table []struct {
 }) {
 	var parser Parser
 	for _, tst := range table {
+		t.Logf("Testing input: %v\n", tst.in)
 		parser = NewParser(tst.in)
 		vals, err := parser.Parse()
 		if err != nil {
@@ -126,6 +127,63 @@ func TestLists(t *testing.T) {
 			},
 			[]stackoval.StackoVal{
 				{StackoType: stackoval.StackoList, Val: []stackoval.StackoVal{
+					{StackoType: stackoval.StackoWord, Val: "foo"},
+					{StackoType: stackoval.StackoWord, Val: "bar"},
+					{StackoType: stackoval.StackoWord, Val: "baz"},
+				}},
+			},
+		},
+	}
+	testTable(t, table)
+}
+
+
+func TestFuncs(t *testing.T) {
+	table := []struct {
+		in  []tokeniser.Token
+		out []stackoval.StackoVal
+	}{
+		{
+			[]tokeniser.Token{
+				{TT: tokeniser.TLB, V: "(", Lexeme: "("},
+				{TT: tokeniser.Tstring, V: "foo bar", Lexeme: "foo bar"},
+				{TT: tokeniser.TRB, V: ")", Lexeme: ")"},
+			},
+			[]stackoval.StackoVal{
+				{StackoType: stackoval.StackoFn, Val: []stackoval.StackoVal{
+					{StackoType: stackoval.StackoString, Val: "foo bar"},
+				}},
+			},
+		},
+		{
+			[]tokeniser.Token{
+				{TT: tokeniser.TLB, V: "(", Lexeme: "("},
+				{TT: tokeniser.Tstring, V: "foo", Lexeme: "foo"},
+				{TT: tokeniser.TLB, V: "(", Lexeme: "("},
+				{TT: tokeniser.Tstring, V: "bar", Lexeme: "bar"},
+				{TT: tokeniser.Tstring, V: "baz", Lexeme: "baz"},
+				{TT: tokeniser.TRB, V: ")", Lexeme: ")"},
+				{TT: tokeniser.TRB, V: ")", Lexeme: ")"},
+			},
+			[]stackoval.StackoVal{
+				{StackoType: stackoval.StackoFn, Val: []stackoval.StackoVal{
+					{StackoType: stackoval.StackoString, Val: "foo"},
+					{StackoType: stackoval.StackoFn, Val: []stackoval.StackoVal{
+						{StackoType: stackoval.StackoString, Val: "bar"},
+						{StackoType: stackoval.StackoString, Val: "baz"},
+					}}}},
+			},
+		},
+		{
+			[]tokeniser.Token{
+				{TT: tokeniser.TLB, V: "(", Lexeme: "("},
+				{TT: tokeniser.Tword, V: "foo", Lexeme: "foo"},
+				{TT: tokeniser.Tword, V: "bar", Lexeme: "bar"},
+				{TT: tokeniser.Tword, V: "baz", Lexeme: "baz"},
+				{TT: tokeniser.TRB, V: ")", Lexeme: ")"},
+			},
+			[]stackoval.StackoVal{
+				{StackoType: stackoval.StackoFn, Val: []stackoval.StackoVal{
 					{StackoType: stackoval.StackoWord, Val: "foo"},
 					{StackoType: stackoval.StackoWord, Val: "bar"},
 					{StackoType: stackoval.StackoWord, Val: "baz"},

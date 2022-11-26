@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"io"
 	"log"
 	"os"
 
@@ -23,6 +24,9 @@ func (runner *Runner) doLine(s string) error {
 	if err != nil {
 		return fmt.Errorf("error while tokenising: %w", err)
 	}
+	if len(tokens) < 1 {
+		return nil
+	}
 
 	runner.prser = parser.NewParser(tokens)
 	vals, err := runner.prser.Parse()
@@ -39,7 +43,7 @@ func (runner *Runner) doLine(s string) error {
 	return nil
 }
 
-func main() {
+func repl() {
 	scanner := bufio.NewScanner(os.Stdin)
 	runner := Runner{
 		vm: vm.NewVM(os.Stdout),
@@ -51,5 +55,32 @@ func main() {
 		if err != nil {
 			log.Println(err)
 		}
+	}
+}
+
+func runFile(fname string) {
+	f, err := os.Open(fname)
+	if err != nil {
+		panic(err)
+	}
+	b, err := io.ReadAll(f)
+	if err != nil {
+		panic(err)
+	}
+	runner := Runner{
+		vm: vm.NewVM(os.Stdout),
+	}
+	err = runner.doLine(string(b))
+	if err != nil {
+		log.Println(err)
+	}
+}
+
+func main() {
+	if len(os.Args) < 2 {
+		repl()
+	} else {
+		fname := os.Args[1]
+		runFile(fname)
 	}
 }

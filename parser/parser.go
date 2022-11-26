@@ -48,6 +48,8 @@ func (parser *Parser) parseToken() (stackoval.StackoVal, error) {
 		return parser.readList()
 	case tokeniser.Tsymbol:
 		return stackoval.StackoVal{StackoType: stackoval.StackoSymbol, Val: curr.V}, nil
+	case tokeniser.TLB:
+		return parser.readFn()
 	default:
 		return stackoval.StackoVal{}, fmt.Errorf("unrecognised token type: %+v", curr)
 	}
@@ -60,6 +62,25 @@ func (parser *Parser) readList() (stackoval.StackoVal, error) {
 		curr := parser.tokens[parser.current]
 		if curr.TT == tokeniser.TRSqB {
 			return stackoval.StackoVal{StackoType: stackoval.StackoList, Val: listEls}, nil
+		}
+		thing, err := parser.parseToken()
+		if err != nil {
+			return stackoval.StackoVal{}, err
+		}
+		listEls = append(listEls, thing)
+		parser.current++
+	}
+
+	return stackoval.StackoVal{}, fmt.Errorf("unexpected end of input while parsing list")
+}
+
+func (parser *Parser) readFn() (stackoval.StackoVal, error) {
+	listEls := make([]stackoval.StackoVal, 0)
+	parser.current++ // Eat the opening '('
+	for parser.current < parser.len {
+		curr := parser.tokens[parser.current]
+		if curr.TT == tokeniser.TRB {
+			return stackoval.StackoVal{StackoType: stackoval.StackoFn, Val: listEls}, nil
 		}
 		thing, err := parser.parseToken()
 		if err != nil {
