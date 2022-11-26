@@ -1,0 +1,9 @@
+(
+  dup 2 <
+  ( )
+  ( dup 1 - fib-rec swap 2 - fib-rec + )
+  if 
+) 'fib-rec def
+
+25 fib-rec .
+"end" .

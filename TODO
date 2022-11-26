@@ -1,0 +1,5 @@
+* List is not a function
+* Loops
+* TCO
+* Rewrite example tests that aren't examples
+* Proper test for example programs / main_test.go

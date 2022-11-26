@@ -1,0 +1,8 @@
+(
+  dup 1 = 
+  ()
+  ( dup 1 - fact * ) 
+  if 
+) 'fact def
+
+20 fact .
