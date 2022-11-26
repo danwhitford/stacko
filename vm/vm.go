@@ -38,11 +38,11 @@ func (vm *VM) Load(extras []stackoval.StackoVal) {
 }
 
 func (vm *VM) Execute() error {
-	for !vm.instructions.Empty() {
+	for !vm.instructions.Empty() {		
 		instruction, err := vm.getNextInstruction()
 		if err != nil {
 			return fmt.Errorf("error getting next instruction %w", err)
-		}
+		}		
 		err = vm.executeInstruction(instruction)
 		if err != nil {
 			return fmt.Errorf("error executing instruction %w", err)
@@ -56,6 +56,14 @@ func (vm *VM) getNextInstruction() (stackoval.StackoVal, error) {
 	if err != nil {
 		return stackoval.StackoVal{}, fmt.Errorf("error getting next instruction: %w", err)
 	}
+	if len(top.Instructions) == 0 {
+		_, err = vm.instructions.Pop()
+		if err != nil {
+			return stackoval.StackoVal{}, fmt.Errorf("error getting next instruction: %w", err)
+		}
+		return stackoval.StackoVal{StackoType: stackoval.StackoNop}, nil
+	}
+
 	instruction := top.Instructions[top.InstructionPointer]
 	top.Advance()
 	if top.InstructionPointer >= top.Length {
@@ -74,8 +82,7 @@ func (vm *VM) executeInstruction(curr stackoval.StackoVal) error {
 		if err != nil {
 			return fmt.Errorf("error while executing '%v': %w", curr, err)
 		}
-		if !execd {
-			// userWord := curr.Val.(string)
+		if !execd {			
 			userWordDef, prs := vm.dictionary[curr.Val.(string)]
 			if !prs {
 				return fmt.Errorf("couldn't find definition for word: %s", curr.Val)
@@ -98,6 +105,8 @@ func (vm *VM) executeInstruction(curr stackoval.StackoVal) error {
 			}
 			return nil
 		}
+	case stackoval.StackoNop:
+		return nil
 	default:
 		vm.stack.Push(curr)
 	}

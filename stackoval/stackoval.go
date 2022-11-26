@@ -17,6 +17,7 @@ const (
 	StackoSymbol
 	StackoBool
 	StackoFn
+	StackoNop
 )
 
 type StackoVal struct {

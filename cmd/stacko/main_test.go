@@ -44,6 +44,10 @@ func TestMain(t *testing.T) {
 			in:  `( dup 1 = ( dup * ) ( dup 1 - fact * ) if ) 'fact def 5 fact v`,
 			out: "120",
 		},
+		{
+			in:  `() 'foo def foo v`,
+			out: "",
+		},
 	}
 
 	for _, test := range table {
