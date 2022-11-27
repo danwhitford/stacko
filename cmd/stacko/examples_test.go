@@ -1,7 +1,7 @@
 package main
 
 import (
-	"io/ioutil"
+	"io"
 	"os"
 	"path"
 	"testing"
@@ -32,7 +32,7 @@ func TestExamples(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		input, err := ioutil.ReadAll(f)
+		input, err := io.ReadAll(f)
 		if err != nil {
 			t.Fatal(err)
 		}

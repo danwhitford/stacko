@@ -3,7 +3,7 @@
 package main
 
 import (
-	"io/ioutil"
+	"io"
 	"log"
 	"os"
 	"text/template"
@@ -68,7 +68,7 @@ func runTemplate(data interface{}, tmplName, outName string) {
 	if err != nil {
 		panic(err)
 	}
-	tmpl, err := ioutil.ReadAll(tmplf)
+	tmpl, err := io.ReadAll(tmplf)
 	if err != nil {
 		panic(err)
 	}
