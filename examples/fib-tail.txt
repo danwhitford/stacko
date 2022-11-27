@@ -1,0 +1,19 @@
+(
+  over over
+) 'twodup def
+
+(
+  dup 2 >
+  ( rot rot 
+    twodup + rot drop
+    rot
+    1 - fib-tail 
+  )
+  ( drop )
+  if
+) 'fib-tail def
+
+1 1 100
+fib-tail
+"Fib 10 is" . .
+"end"
