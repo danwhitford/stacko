@@ -67,18 +67,16 @@ func (vm *VM) getNextInstruction() (stackoval.StackoVal, error) {
 	}
 
 	instruction := top.Instructions[top.InstructionPointer]
-
+	vm.advanceInstruction()
 	return instruction, nil
 }
 
 func (vm *VM) executeInstruction(curr stackoval.StackoVal) error {
 	if curr.StackoType == stackoval.StackoWord && curr.Val.(string) == "if" {
-		vm.advanceInstruction()
 		err := vm.execIf()
 		return err
 	}
 
-	vm.advanceInstruction()
 	switch curr.StackoType {
 	case stackoval.StackoWord:
 		execd, err := vm.execBuiltin(curr.Val.(string))
