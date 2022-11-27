@@ -55,17 +55,6 @@ func TestMain(t *testing.T) {
 			v`,
 			out: "55",
 		},
-		// {
-		// 	in:  `(
-		// 		dup 2 <
-		// 		( 1 * )
-		// 		( dup 1 - recur swap 2 - recur + )
-		// 		if 
-		// 	) 'fib-rec def
-		// 	10 fib-rec
-		// 	v`,
-		// 	out: "55",
-		// },
 		{
 			in:  `() 'foo def foo v`,
 			out: "",
