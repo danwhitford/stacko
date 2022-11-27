@@ -72,9 +72,38 @@ func (vm *VM) execBuiltin(word string) (bool, error) {
 		return true, vm.Lt()
 	case "recur":
 		return true, vm.Recur()
+	case "if":
+		return true, vm.If()
 	default:
 		return false, nil
 	}
+}
+
+func (vm *VM) If() error {
+	stack := &vm.stack
+
+	falseBranch, err := stack.Pop()
+	if err != nil {
+		return fmt.Errorf("error getting false branch: %w", err)
+	}
+	trueBranch, err := stack.Pop()
+	if err != nil {
+		return fmt.Errorf("error getting true branch: %w", err)
+	}
+	condition, err := stack.Pop()
+	if err != nil {
+		return fmt.Errorf("error getting condition: %w", err)
+	}
+	var branch stackoval.StackoVal
+	if condition.Val == true {
+		branch = trueBranch
+	} else {
+		branch = falseBranch
+	}
+
+	next := listise(branch)
+	vm.Load(next)
+	return nil
 }
 
 func listise(val stackoval.StackoVal) []stackoval.StackoVal {

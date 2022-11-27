@@ -72,30 +72,9 @@ func (vm *VM) getNextInstruction() (stackoval.StackoVal, error) {
 }
 
 func (vm *VM) executeInstruction(curr stackoval.StackoVal) error {
-	if curr.StackoType == stackoval.StackoWord && curr.Val.(string) == "if" {
-		err := vm.execIf()
-		return err
-	}
-
 	switch curr.StackoType {
 	case stackoval.StackoWord:
-		execd, err := vm.execBuiltin(curr.Val.(string))
-		if err != nil {
-			return fmt.Errorf("error while executing '%v': %w", curr, err)
-		}
-		if !execd {
-			userWordDef, prs := vm.dictionary[curr.Val.(string)]
-			if !prs {
-				return fmt.Errorf("couldn't find definition for word: %s", curr.Val)
-			}
-			switch userWordDef.StackoType {
-			case stackoval.StackoFn:
-				vm.Load(userWordDef.Val.([]stackoval.StackoVal))
-			default:
-				vm.Load([]stackoval.StackoVal{userWordDef})
-			}
-			return nil
-		}
+		return vm.execWord(curr)
 	default:
 		vm.stack.Push(curr)
 	}
@@ -118,29 +97,29 @@ func (vm *VM) advanceInstruction() error {
 	return nil
 }
 
-func (vm *VM) execIf() error {
-	stack := &vm.stack
+func (vm *VM) execWord(curr stackoval.StackoVal) error {	
+	// Try builtins first
+	execd, err := vm.execBuiltin(curr.Val.(string))
+	if err != nil {
+		return fmt.Errorf("error while executing '%v': %w", curr, err)
+	}
+	if !execd {
+		// Must be a user defined word
+		return vm.execUserWord(curr)
+	}
+	return nil
+}
 
-	falseBranch, err := stack.Pop()
-	if err != nil {
-		return fmt.Errorf("error getting false branch: %w", err)
+func (vm *VM) execUserWord(curr stackoval.StackoVal) error {
+	userWordDef, prs := vm.dictionary[curr.Val.(string)]
+	if !prs {
+		return fmt.Errorf("couldn't find definition for word: %s", curr.Val)
 	}
-	trueBranch, err := stack.Pop()
-	if err != nil {
-		return fmt.Errorf("error getting true branch: %w", err)
+	switch userWordDef.StackoType {
+	case stackoval.StackoFn:
+		vm.Load(userWordDef.Val.([]stackoval.StackoVal))
+	default:
+		vm.Load([]stackoval.StackoVal{userWordDef})
 	}
-	condition, err := stack.Pop()
-	if err != nil {
-		return fmt.Errorf("error getting condition: %w", err)
-	}
-	var branch stackoval.StackoVal
-	if condition.Val == true {
-		branch = trueBranch
-	} else {
-		branch = falseBranch
-	}
-
-	next := listise(branch)
-	vm.Load(next)
 	return nil
 }
