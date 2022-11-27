@@ -5,4 +5,4 @@
   if 
 ) 'fact def
 
-20 fact .
+10 fact .

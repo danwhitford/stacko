@@ -58,7 +58,7 @@ func repl() {
 	}
 }
 
-func runFile(fname string) {
+func runFile(fname string, outf io.Writer) {
 	f, err := os.Open(fname)
 	if err != nil {
 		panic(err)
@@ -68,7 +68,7 @@ func runFile(fname string) {
 		panic(err)
 	}
 	runner := Runner{
-		vm: vm.NewVM(os.Stdout),
+		vm: vm.NewVM(outf),
 	}
 	err = runner.doLine(string(b))
 	if err != nil {
@@ -81,6 +81,6 @@ func main() {
 		repl()
 	} else {
 		fname := os.Args[1]
-		runFile(fname)
+		runFile(fname, os.Stdout)
 	}
 }

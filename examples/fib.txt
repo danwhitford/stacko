@@ -6,5 +6,3 @@
 ) 'fib-rec def
 
 10 fib-rec .
-"end" .
-v
