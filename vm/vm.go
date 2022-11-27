@@ -65,6 +65,13 @@ func (vm *VM) getNextInstruction() (stackoval.StackoVal, error) {
 	}
 
 	instruction := top.Instructions[top.InstructionPointer]
+	top.Advance()
+	if top.InstructionPointer >= top.Length {
+		_, err = vm.instructions.Pop()
+		if err != nil {
+			return stackoval.StackoVal{}, fmt.Errorf("error getting next instruction: %w", err)
+		}
+	}
 	return instruction, nil
 }
 
@@ -107,18 +114,6 @@ func (vm *VM) executeInstruction(curr stackoval.StackoVal) error {
 		return nil
 	default:
 		vm.stack.Push(curr)
-	}
-
-	top, err := vm.instructions.Peek()
-	if err != nil {
-		return fmt.Errorf("error getting next instruction: %w", err)
-	}
-	top.Advance()
-	if top.InstructionPointer >= top.Length {
-		_, err = vm.instructions.Pop()
-		if err != nil {
-			return fmt.Errorf("error getting next instruction: %w", err)
-		}
 	}
 	return nil
 }
