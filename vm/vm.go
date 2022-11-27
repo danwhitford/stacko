@@ -43,9 +43,11 @@ func (vm *VM) Execute() error {
 		if err != nil {
 			return fmt.Errorf("error getting next instruction %w", err)
 		}
-		err = vm.executeInstruction(instruction)
-		if err != nil {
-			return fmt.Errorf("error executing instruction %w", err)
+		if instruction.StackoType != stackoval.StackoNop {
+			err := vm.executeInstruction(instruction)
+			if err != nil {
+				return fmt.Errorf("error executing instruction %w", err)
+			}
 		}
 	}
 	return nil
@@ -65,20 +67,20 @@ func (vm *VM) getNextInstruction() (stackoval.StackoVal, error) {
 	}
 
 	instruction := top.Instructions[top.InstructionPointer]
-	err = vm.advanceInstruction()
-	if err != nil {
-		return instruction, err
-	}
 
 	return instruction, nil
 }
 
 func (vm *VM) executeInstruction(curr stackoval.StackoVal) error {
+	if curr.StackoType == stackoval.StackoWord && curr.Val.(string) == "if" {
+		vm.advanceInstruction()
+		err := vm.execIf()
+		return err
+	}
+
+	vm.advanceInstruction()
 	switch curr.StackoType {
 	case stackoval.StackoWord:
-		if curr.Val.(string) == "if" {
-			return vm.execIf()
-		}
 		execd, err := vm.execBuiltin(curr.Val.(string))
 		if err != nil {
 			return fmt.Errorf("error while executing '%v': %w", curr, err)
@@ -90,26 +92,12 @@ func (vm *VM) executeInstruction(curr stackoval.StackoVal) error {
 			}
 			switch userWordDef.StackoType {
 			case stackoval.StackoFn:
-				frame := InstructionFrame{
-					userWordDef.Val.([]stackoval.StackoVal),
-					len(userWordDef.Val.([]stackoval.StackoVal)),
-					0,
-					curr.Val.(string),
-				}
-				vm.instructions.Push(frame)
+				vm.Load(userWordDef.Val.([]stackoval.StackoVal))
 			default:
-				frame := InstructionFrame{
-					[]stackoval.StackoVal{userWordDef},
-					1,
-					0,
-					"",
-				}
-				vm.instructions.Push(frame)
+				vm.Load([]stackoval.StackoVal{userWordDef})
 			}
 			return nil
 		}
-	case stackoval.StackoNop:
-		return nil
 	default:
 		vm.stack.Push(curr)
 	}

@@ -265,6 +265,15 @@ func TestIfStuff(t *testing.T) {
 		},
 			out: stackoval.StackoVal{StackoType: stackoval.StackoInt, Val: 100},
 		},
+		{in: []stackoval.StackoVal{
+			{StackoType: stackoval.StackoInt, Val: 10},
+			{StackoType: stackoval.StackoBool, Val: true},
+			{StackoType: stackoval.StackoFn, Val: []stackoval.StackoVal{}},
+			{StackoType: stackoval.StackoSymbol, Val: "nonsuch"},
+			{StackoType: stackoval.StackoWord, Val: "if"},
+		},
+			out: stackoval.StackoVal{StackoType: stackoval.StackoInt, Val: 10},
+		},
 	}
 
 	testTable(t, table)

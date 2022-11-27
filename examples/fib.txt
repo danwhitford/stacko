@@ -7,3 +7,4 @@
 
 10 fib-rec .
 "end" .
+v

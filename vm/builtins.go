@@ -83,7 +83,7 @@ func listise(val stackoval.StackoVal) []stackoval.StackoVal {
 		casted := val.Val.([]stackoval.StackoVal)
 		return casted
 	case stackoval.StackoSymbol:
-		return []stackoval.StackoVal{{StackoType: stackoval.StackoWord, Val: val.Val}}
+		return []stackoval.StackoVal{{StackoType: stackoval.StackoWord, Val: val.Val}}	
 	default:
 		return []stackoval.StackoVal{val}
 	}
