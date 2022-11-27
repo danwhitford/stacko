@@ -5,5 +5,5 @@
   if 
 ) 'fib-rec def
 
-25 fib-rec .
+10 fib-rec .
 "end" .

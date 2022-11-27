@@ -78,6 +78,9 @@ func (vm *VM) getNextInstruction() (stackoval.StackoVal, error) {
 func (vm *VM) executeInstruction(curr stackoval.StackoVal) error {
 	switch curr.StackoType {
 	case stackoval.StackoWord:
+		if curr.Val.(string) == "if" {
+			return vm.execIf()
+		}
 		execd, err := vm.execBuiltin(curr.Val.(string))
 		if err != nil {
 			return fmt.Errorf("error while executing '%v': %w", curr, err)
@@ -93,6 +96,7 @@ func (vm *VM) executeInstruction(curr stackoval.StackoVal) error {
 					userWordDef.Val.([]stackoval.StackoVal),
 					len(userWordDef.Val.([]stackoval.StackoVal)),
 					0,
+					curr.Val.(string),
 				}
 				vm.instructions.Push(frame)
 			default:
@@ -100,6 +104,7 @@ func (vm *VM) executeInstruction(curr stackoval.StackoVal) error {
 					[]stackoval.StackoVal{userWordDef},
 					1,
 					0,
+					"",
 				}
 				vm.instructions.Push(frame)
 			}
@@ -110,5 +115,32 @@ func (vm *VM) executeInstruction(curr stackoval.StackoVal) error {
 	default:
 		vm.stack.Push(curr)
 	}
+	return nil
+}
+
+func (vm *VM) execIf() error {
+	stack := &vm.stack
+
+	falseBranch, err := stack.Pop()
+	if err != nil {
+		return fmt.Errorf("error getting false branch: %w", err)
+	}
+	trueBranch, err := stack.Pop()
+	if err != nil {
+		return fmt.Errorf("error getting true branch: %w", err)
+	}
+	condition, err := stack.Pop()
+	if err != nil {
+		return fmt.Errorf("error getting condition: %w", err)
+	}
+	var branch stackoval.StackoVal
+	if condition.Val == true {
+		branch = trueBranch
+	} else {
+		branch = falseBranch
+	}
+
+	next := listise(branch)
+	vm.Load(next)
 	return nil
 }

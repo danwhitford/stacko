@@ -70,8 +70,8 @@ func (vm *VM) execBuiltin(word string) (bool, error) {
 		return true, vm.Gt()
 	case "<":
 		return true, vm.Lt()
-	case "if":
-		return true, vm.If()
+	case "recur":
+		return true, vm.Recur()
 	default:
 		return false, nil
 	}
@@ -89,30 +89,24 @@ func listise(val stackoval.StackoVal) []stackoval.StackoVal {
 	}
 }
 
-func (vm *VM) If() error {
-	stack := &vm.stack
-
-	falseBranch, err := stack.Pop()
-	if err != nil {
-		return fmt.Errorf("error getting false branch: %w", err)
+func (vm *VM) Recur() error {
+	var name string
+	var top *InstructionFrame
+	for name == "" {
+		fmt.Printf("top %+v\n", top)
+		fmt.Printf("name %+v\n", name)
+		var err error
+		top, err = vm.instructions.Peek()
+		if err != nil {
+			return err
+		}
+		_, err = vm.instructions.Pop()
+		if err != nil {
+			panic(err)
+		}
 	}
-	trueBranch, err := stack.Pop()
-	if err != nil {
-		return fmt.Errorf("error getting true branch: %w", err)
-	}
-	condition, err := stack.Pop()
-	if err != nil {
-		return fmt.Errorf("error getting condition: %w", err)
-	}
-	var branch stackoval.StackoVal
-	if condition.Val == true {
-		branch = trueBranch
-	} else {
-		branch = falseBranch
-	}
-
-	next := listise(branch)
-	vm.Load(next)
+	fmt.Printf("top %+v\n", top)
+	top.InstructionPointer = 0
 	return nil
 }
 

@@ -309,11 +309,12 @@ func testTable(t *testing.T, table []struct {
 	out stackoval.StackoVal
 }) {
 	for _, test := range table {
+		fmt.Printf("testing %v\n", test.in)
 		vm := NewVM(os.Stdout)
 		vm.Load(test.in)
 		err := vm.Execute()
 		if err != nil {
-			t.Error(err)
+			t.Errorf("%s\n%s", test.in, err)
 		}
 		top, err := vm.stack.Peek()
 		if err != nil {
