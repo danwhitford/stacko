@@ -1,0 +1,19 @@
+
+(
+  dup 15 % 0 =
+  ( drop "fizzbuzz" . )
+  (
+    dup 5 % 0 =
+    ( drop "buzz" . )
+    (
+      dup 3 % 0 =
+      ( drop "fizz" . )
+      ( dup . )
+      if
+    )
+    if
+  )
+  if
+) 'fizzbuzz def
+
+'fizzbuzz 15 range each

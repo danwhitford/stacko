@@ -5,6 +5,7 @@ package vm
 import (
 	"fmt"
 
+	"github.com/danwhitford/stacko/stack"
 	"github.com/danwhitford/stacko/stackoval"
 )
 
@@ -74,9 +75,90 @@ func (vm *VM) execBuiltin(word string) (bool, error) {
 		return true, vm.Recur()
 	case "if":
 		return true, vm.If()
+	case "clear":
+		return true, vm.Clear()
+	case "nuke":
+		return true, vm.Nuke()
+	case "range":
+		return true, vm.Range()
+	case "each":
+		return true, vm.Each()
+	case "times":
+		return true, vm.Times()
 	default:
 		return false, nil
 	}
+}
+
+func (vm *VM) Times() error {
+	stack := &vm.stack
+	a, err := stack.Pop()
+	if err != nil {
+		return fmt.Errorf("error getting false branch: %w", err)
+	}
+	if a.StackoType != stackoval.StackoInt {
+		return fmt.Errorf("wanted int for range but got %+v", a)
+	}
+	lim := a.Val.(int)
+
+	b, err := stack.Pop()
+	if err != nil {
+		return fmt.Errorf("error getting false branch: %w", err)
+	}
+	if b.StackoType != stackoval.StackoFn {
+		return fmt.Errorf("wanted function for range but got %+v", a)
+	}
+
+	for i := 0; i < lim; i++ {
+		vm.instructions = append(vm.instructions, InstructionFrame{
+			Instructions: listise(b),
+			Length: len(b.Val.([]stackoval.StackoVal)),
+		})
+	}
+	return nil
+}
+
+func (vm *VM) Each() error {
+	// stack := &vm.stack
+	// a, err := stack.Pop()
+	// if err != nil {
+	// 	return fmt.Errorf("error getting false branch: %w", err)
+	// }
+	// if a.StackoType != stackoval.StackoList {
+	// 	return fmt.Errorf("wanted list for range but got %+v", a)
+	// }
+	// lim := a.Val.(int)
+	// vm.loopControlStack.Push(LoopControlFrame{lim})
+	return nil
+}
+
+func (vm *VM) Range() error {
+	stack := &vm.stack
+	a, err := stack.Pop()
+	if err != nil {
+		return fmt.Errorf("error getting false branch: %w", err)
+	}
+	if a.StackoType != stackoval.StackoInt {
+		return fmt.Errorf("wanted int for range but got %+v", a)
+	}
+	lim := a.Val.(int)
+	ret := make([]stackoval.StackoVal, lim)
+	for i := range ret {
+		ret[i] = stackoval.StackoVal{StackoType: stackoval.StackoInt, Val: i}
+	}
+	val := stackoval.StackoVal{StackoType: stackoval.StackoList, Val: ret}
+	stack.Push(val)
+	return nil
+}
+
+func (vm *VM) Nuke() error {
+	vm.Reset()
+	return nil
+}
+
+func (vm *VM) Clear() error {
+	vm.stack = make(stack.Stack[stackoval.StackoVal], 0)
+	return nil
 }
 
 func (vm *VM) If() error {
@@ -112,7 +194,7 @@ func listise(val stackoval.StackoVal) []stackoval.StackoVal {
 		casted := val.Val.([]stackoval.StackoVal)
 		return casted
 	case stackoval.StackoSymbol:
-		return []stackoval.StackoVal{{StackoType: stackoval.StackoWord, Val: val.Val}}	
+		return []stackoval.StackoVal{{StackoType: stackoval.StackoWord, Val: val.Val}}
 	default:
 		return []stackoval.StackoVal{val}
 	}

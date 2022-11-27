@@ -313,6 +313,78 @@ func TestBuiltIns(t *testing.T) {
 	testTable(t, table)
 }
 
+func TestLoops(t *testing.T) {
+	table := []struct {
+		in  []stackoval.StackoVal
+		out stackoval.StackoVal
+	}{
+		{
+			in: []stackoval.StackoVal{
+				{StackoType: stackoval.StackoInt, Val: 10},
+				{StackoType: stackoval.StackoWord, Val: "range"},
+			},
+			out: stackoval.StackoVal{
+				StackoType: stackoval.StackoList,
+				Val: []stackoval.StackoVal{
+					{stackoval.StackoInt, 0},
+					{stackoval.StackoInt, 1},
+					{stackoval.StackoInt, 2},
+					{stackoval.StackoInt, 3},
+					{stackoval.StackoInt, 4},
+					{stackoval.StackoInt, 5},
+					{stackoval.StackoInt, 6},
+					{stackoval.StackoInt, 7},
+					{stackoval.StackoInt, 8},
+					{stackoval.StackoInt, 9},
+				},
+			},
+		},
+		{
+			in: []stackoval.StackoVal{
+				{StackoType: stackoval.StackoInt, Val: 0},
+				{StackoType: stackoval.StackoFn, Val: []stackoval.StackoVal{
+					{StackoType: stackoval.StackoInt, Val: 1},
+					{StackoType: stackoval.StackoWord, Val: "+"},
+				}},
+				{StackoType: stackoval.StackoInt, Val: 5},
+				{StackoType: stackoval.StackoWord, Val: "times"},
+			},
+			out: stackoval.StackoVal{
+				StackoType: stackoval.StackoInt,
+				Val:        5,
+			},
+		},
+		// {
+		// 	in: []stackoval.StackoVal{
+		// 		{StackoType: stackoval.StackoInt, Val: "0"},
+		// 		{StackoType: stackoval.StackoSymbol, Val: "+"},
+		// 		{
+		// 			StackoType: stackoval.StackoList,
+		// 			Val: []stackoval.StackoVal{
+		// 				{stackoval.StackoInt, 0},
+		// 				{stackoval.StackoInt, 1},
+		// 				{stackoval.StackoInt, 2},
+		// 				{stackoval.StackoInt, 3},
+		// 				{stackoval.StackoInt, 4},
+		// 				{stackoval.StackoInt, 5},
+		// 				{stackoval.StackoInt, 6},
+		// 				{stackoval.StackoInt, 7},
+		// 				{stackoval.StackoInt, 8},
+		// 				{stackoval.StackoInt, 9},
+		// 			},
+		// 		},
+		// 		{StackoType: stackoval.StackoWord, Val: "each"},
+		// 	},
+		// 	out: stackoval.StackoVal{
+		// 		StackoType: stackoval.StackoInt,
+		// 		Val:        15,
+		// 	},
+		// },
+	}
+
+	testTable(t, table)
+}
+
 func testTable(t *testing.T, table []struct {
 	in  []stackoval.StackoVal
 	out stackoval.StackoVal
@@ -323,15 +395,15 @@ func testTable(t *testing.T, table []struct {
 		vm.Load(test.in)
 		err := vm.Execute()
 		if err != nil {
-			t.Errorf("%s\n%s", test.in, err)
+			t.Fatalf("%s\n%s", test.in, err)
 		}
 		top, err := vm.stack.Peek()
 		if err != nil {
-			t.Error(err)
+			t.Fatal(err)
 		}
 		diff := cmp.Diff(test.out, *top)
 		if diff != "" {
-			t.Errorf("failed %s\n(-want +got):\n%s", test.in, diff)
+			t.Fatalf("failed %s\n(-want +got):\n%s", test.in, diff)
 		}
 	}
 }

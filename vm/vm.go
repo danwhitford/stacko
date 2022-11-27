@@ -9,10 +9,11 @@ import (
 )
 
 type VM struct {
-	dictionary   map[string]stackoval.StackoVal
-	instructions stack.Stack[InstructionFrame]
-	stack        stack.Stack[stackoval.StackoVal]
-	outF         io.Writer
+	dictionary       map[string]stackoval.StackoVal
+	instructions     stack.Stack[InstructionFrame]
+	stack            stack.Stack[stackoval.StackoVal]
+	loopControlStack stack.Stack[LoopControlFrame]
+	outF             io.Writer
 }
 
 func NewVM(r io.Writer) VM {
@@ -25,7 +26,16 @@ func NewVM(r io.Writer) VM {
 		dictionary,
 		instructions,
 		make(stack.Stack[stackoval.StackoVal], 0),
+		make(stack.Stack[LoopControlFrame], 0),
 		r}
+}
+
+func (vm *VM) Reset() {
+	vm.dictionary = map[string]stackoval.StackoVal{
+		"true": {StackoType: stackoval.StackoBool, Val: true},
+	}
+	vm.instructions = make(stack.Stack[InstructionFrame], 0)
+	vm.stack = make(stack.Stack[stackoval.StackoVal], 0)
 }
 
 func (vm *VM) Load(extras []stackoval.StackoVal) {
@@ -89,6 +99,22 @@ func (vm *VM) advanceInstruction() error {
 
 	top.Advance()
 	if top.InstructionPointer >= top.Length {
+		if !vm.loopControlStack.Empty() {
+			topLoop, err := vm.loopControlStack.Peek()
+			if err != nil {
+				return fmt.Errorf("error getting next instruction: %w", err)
+			}
+			if topLoop.Counter > 0 {
+				topLoop.Counter--
+			} else {
+				_, err := vm.loopControlStack.Pop()
+				if err != nil {
+					return fmt.Errorf("error getting next instruction: %w", err)
+				}
+			}
+			return nil
+		}
+
 		_, err = vm.instructions.Pop()
 		if err != nil {
 			return fmt.Errorf("error getting next instruction: %w", err)
@@ -97,7 +123,7 @@ func (vm *VM) advanceInstruction() error {
 	return nil
 }
 
-func (vm *VM) execWord(curr stackoval.StackoVal) error {	
+func (vm *VM) execWord(curr stackoval.StackoVal) error {
 	// Try builtins first
 	execd, err := vm.execBuiltin(curr.Val.(string))
 	if err != nil {

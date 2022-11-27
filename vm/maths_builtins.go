@@ -2,8 +2,7 @@ package vm
 
 import "fmt"
 
-import 	"github.com/danwhitford/stacko/stackoval"
-
+import "github.com/danwhitford/stacko/stackoval"
 
 func (vm *VM) Add() error {
 	a, err := vm.stack.Pop()
@@ -154,4 +153,3 @@ func (vm *VM) Mod() error {
 	}
 	return nil
 }
-

@@ -43,8 +43,8 @@ func mathsBuiltins() {
 
 func booleanBuiltins() {
 	var operators = []struct {
-		Name    string
-		Op      string
+		Name string
+		Op   string
 	}{
 		{
 			Name: "Eq",

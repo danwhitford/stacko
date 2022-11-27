@@ -8,7 +8,6 @@ type InstructionFrame struct {
 	Instructions       []stackoval.StackoVal
 	Length             int
 	InstructionPointer int
-	Name string
 }
 
 func (frame *InstructionFrame) Advance() error {

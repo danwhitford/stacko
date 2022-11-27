@@ -15,14 +15,17 @@ func run(t *testing.T, in string, out string) {
 	runner := Runner{
 		vm: vm.NewVM(&w),
 	}
-	runner.doLine(in)
+	err := runner.doLine(in)
+	if err != nil {
+		t.Error(err)
+	}
 	b, err := io.ReadAll(&w)
 	if err != nil {
 		t.Error(err)
 	}
 	diff := cmp.Diff(out, strings.TrimSpace(string(b)))
 	if diff != "" {
-		t.Errorf("failed input '%s'\nmismatch (-want +got):\n%s\n%+v", in, diff, runner.vm)		
+		t.Errorf("failed input '%s'\nmismatch (-want +got):\n%s\n", in, diff)
 	}
 }
 
@@ -45,7 +48,7 @@ func TestMain(t *testing.T) {
 			out: "120",
 		},
 		{
-			in:  `(
+			in: `(
 				dup 2 <
 				( )
 				( dup 1 - fib-rec swap 2 - fib-rec + )
