@@ -97,12 +97,7 @@ func (vm *VM) advanceInstruction() error {
 	}
 
 	top.Advance()
-	if top.InstructionPointer >= top.Length {
-		if top.LoopCounter > 0 {
-			top.LoopCounter--
-			top.InstructionPointer = 0
-			return nil
-		}
+	if top.Finished() {
 		_, err = vm.instructions.Pop()
 		if err != nil {
 			return fmt.Errorf("error getting next instruction: %w", err)

@@ -15,3 +15,14 @@ func (frame *InstructionFrame) Advance() error {
 	frame.InstructionPointer++
 	return nil
 }
+
+func (frame *InstructionFrame) Finished() bool {
+	if frame.InstructionPointer >= frame.Length {
+		if frame.LoopCounter > 0 {
+			frame.LoopCounter--
+			frame.InstructionPointer = 0
+			return false
+		}
+	}
+	return true
+}
