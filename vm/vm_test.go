@@ -76,7 +76,10 @@ func TestMaths(t *testing.T) {
 		t.Log(tst)
 		vm := NewVM(os.Stdout)
 		vm.Load(tst.input)
-		vm.Execute()
+		err := vm.Execute()
+		if err != nil {
+			t.Fatal(err)
+		}
 
 		if vm.stack[0].Val != tst.expected {
 			t.Fatalf("can't do maffs for %+v got %+v", tst, vm.stack[0])
@@ -268,7 +271,7 @@ func TestIfStuff(t *testing.T) {
 		{in: []stackoval.StackoVal{
 			{StackoType: stackoval.StackoInt, Val: 10},
 			{StackoType: stackoval.StackoBool, Val: true},
-			{StackoType: stackoval.StackoFn, Val: []stackoval.StackoVal{}},
+			{StackoType: stackoval.StackoFn, Val: []stackoval.StackoVal{{StackoType: stackoval.StackoNop}}},
 			{StackoType: stackoval.StackoSymbol, Val: "nonsuch"},
 			{StackoType: stackoval.StackoWord, Val: "if"},
 		},

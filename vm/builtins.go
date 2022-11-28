@@ -71,8 +71,6 @@ func (vm *VM) execBuiltin(word string) (bool, error) {
 		return true, vm.Gt()
 	case "<":
 		return true, vm.Lt()
-	case "recur":
-		return true, vm.Recur()
 	case "if":
 		return true, vm.If()
 	case "clear":
@@ -110,12 +108,7 @@ func (vm *VM) Times() error {
 	}
 
 	next := listise(b)
-	frame := InstructionFrame{
-		next,
-		len(next),
-		0,
-		lim-1,
-	}
+	frame := NewRegularFrame(next, lim-1)
 	vm.instructions.Push(frame)
 	return nil
 }
@@ -185,6 +178,7 @@ func (vm *VM) If() error {
 		branch = falseBranch
 	}
 
+	fmt.Printf("%+v\n%+v\n%+v\n", falseBranch, trueBranch, branch)
 	next := listise(branch)
 	vm.Load(next)
 	return nil
@@ -200,27 +194,6 @@ func listise(val stackoval.StackoVal) []stackoval.StackoVal {
 	default:
 		return []stackoval.StackoVal{val}
 	}
-}
-
-func (vm *VM) Recur() error {
-	var name string
-	var top *InstructionFrame
-	for name == "" {
-		fmt.Printf("top %+v\n", top)
-		fmt.Printf("name %+v\n", name)
-		var err error
-		top, err = vm.instructions.Peek()
-		if err != nil {
-			return err
-		}
-		_, err = vm.instructions.Pop()
-		if err != nil {
-			panic(err)
-		}
-	}
-	fmt.Printf("top %+v\n", top)
-	top.InstructionPointer = 0
-	return nil
 }
 
 func (vm *VM) Dbg() error {

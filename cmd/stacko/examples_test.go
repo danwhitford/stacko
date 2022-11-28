@@ -45,6 +45,7 @@ func TestExamples(t *testing.T) {
 	}
 
 	for _, item := range table {
+		t.Logf("Testing %s\n", item.fname)
 		path := path.Join("../..", "examples", item.fname)
 		f, err := os.Open(path)
 		if err != nil {

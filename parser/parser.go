@@ -80,6 +80,11 @@ func (parser *Parser) readFn() (stackoval.StackoVal, error) {
 	for parser.current < parser.len {
 		curr := parser.tokens[parser.current]
 		if curr.TT == tokeniser.TRB {
+			if len(listEls) == 0 {
+				return stackoval.StackoVal{StackoType: stackoval.StackoFn, Val: []stackoval.StackoVal{
+					{StackoType: stackoval.StackoNop, Val: nil},
+				}}, nil
+			}
 			return stackoval.StackoVal{StackoType: stackoval.StackoFn, Val: listEls}, nil
 		}
 		thing, err := parser.parseToken()

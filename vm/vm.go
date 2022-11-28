@@ -37,12 +37,7 @@ func (vm *VM) Reset() {
 }
 
 func (vm *VM) Load(extras []stackoval.StackoVal) {
-	frame := InstructionFrame{
-		Instructions:       extras,
-		Length:             len(extras),
-		InstructionPointer: 0,
-		LoopCounter: 0,
-	}
+	frame := NewRegularFrame(extras, 0)
 	vm.instructions.Push(frame)
 }
 
@@ -67,15 +62,15 @@ func (vm *VM) getNextInstruction() (stackoval.StackoVal, error) {
 	if err != nil {
 		return stackoval.StackoVal{}, fmt.Errorf("error getting next instruction: %w", err)
 	}
-	if len(top.Instructions) == 0 {
-		_, err = vm.instructions.Pop()
-		if err != nil {
-			return stackoval.StackoVal{}, fmt.Errorf("error getting next instruction: %w", err)
-		}
-		return stackoval.StackoVal{StackoType: stackoval.StackoNop}, nil
-	}
+	// if len(top.Instructions) == 0 {
+	// 	_, err = vm.instructions.Pop()
+	// 	if err != nil {
+	// 		return stackoval.StackoVal{}, fmt.Errorf("error getting next instruction: %w", err)
+	// 	}
+	// 	return stackoval.StackoVal{StackoType: stackoval.StackoNop}, nil
+	// }
 
-	instruction := top.Instructions[top.InstructionPointer]
+	instruction := (*top).GetNext()
 	vm.advanceInstruction()
 	return instruction, nil
 }
@@ -96,8 +91,8 @@ func (vm *VM) advanceInstruction() error {
 		return fmt.Errorf("error getting next instruction: %w", err)
 	}
 
-	top.Advance()
-	if top.Finished() {
+	(*top).Advance()
+	if (*top).Finished() {
 		_, err = vm.instructions.Pop()
 		if err != nil {
 			return fmt.Errorf("error getting next instruction: %w", err)
