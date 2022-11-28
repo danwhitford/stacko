@@ -8,6 +8,7 @@ type InstructionFrame struct {
 	Instructions       []stackoval.StackoVal
 	Length             int
 	InstructionPointer int
+	LoopCounter        int
 }
 
 func (frame *InstructionFrame) Advance() error {

@@ -12,7 +12,6 @@ type VM struct {
 	dictionary       map[string]stackoval.StackoVal
 	instructions     stack.Stack[InstructionFrame]
 	stack            stack.Stack[stackoval.StackoVal]
-	loopControlStack stack.Stack[LoopControlFrame]
 	outF             io.Writer
 }
 
@@ -26,7 +25,6 @@ func NewVM(r io.Writer) VM {
 		dictionary,
 		instructions,
 		make(stack.Stack[stackoval.StackoVal], 0),
-		make(stack.Stack[LoopControlFrame], 0),
 		r}
 }
 
@@ -43,6 +41,7 @@ func (vm *VM) Load(extras []stackoval.StackoVal) {
 		Instructions:       extras,
 		Length:             len(extras),
 		InstructionPointer: 0,
+		LoopCounter: 0,
 	}
 	vm.instructions.Push(frame)
 }
@@ -99,22 +98,11 @@ func (vm *VM) advanceInstruction() error {
 
 	top.Advance()
 	if top.InstructionPointer >= top.Length {
-		if !vm.loopControlStack.Empty() {
-			topLoop, err := vm.loopControlStack.Peek()
-			if err != nil {
-				return fmt.Errorf("error getting next instruction: %w", err)
-			}
-			if topLoop.Counter > 0 {
-				topLoop.Counter--
-			} else {
-				_, err := vm.loopControlStack.Pop()
-				if err != nil {
-					return fmt.Errorf("error getting next instruction: %w", err)
-				}
-			}
+		if top.LoopCounter > 0 {
+			top.LoopCounter--
+			top.InstructionPointer = 0
 			return nil
 		}
-
 		_, err = vm.instructions.Pop()
 		if err != nil {
 			return fmt.Errorf("error getting next instruction: %w", err)

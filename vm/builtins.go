@@ -109,12 +109,14 @@ func (vm *VM) Times() error {
 		return fmt.Errorf("wanted function for range but got %+v", a)
 	}
 
-	for i := 0; i < lim; i++ {
-		vm.instructions = append(vm.instructions, InstructionFrame{
-			Instructions: listise(b),
-			Length: len(b.Val.([]stackoval.StackoVal)),
-		})
+	next := listise(b)
+	frame := InstructionFrame{
+		next,
+		len(next),
+		0,
+		lim-1,
 	}
+	vm.instructions.Push(frame)
 	return nil
 }
 
