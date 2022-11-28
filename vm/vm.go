@@ -9,10 +9,10 @@ import (
 )
 
 type VM struct {
-	dictionary       map[string]stackoval.StackoVal
-	instructions     stack.Stack[InstructionFrame]
-	stack            stack.Stack[stackoval.StackoVal]
-	outF             io.Writer
+	dictionary   map[string]stackoval.StackoVal
+	instructions stack.Stack[InstructionFrame]
+	stack        stack.Stack[stackoval.StackoVal]
+	outF         io.Writer
 }
 
 func NewVM(r io.Writer) VM {
@@ -37,7 +37,7 @@ func (vm *VM) Reset() {
 }
 
 func (vm *VM) Load(extras []stackoval.StackoVal) {
-	frame := NewRegularFrame(extras, 0)
+	frame := NewRegularFrame(extras)
 	vm.instructions.Push(frame)
 }
 
@@ -62,16 +62,14 @@ func (vm *VM) getNextInstruction() (stackoval.StackoVal, error) {
 	if err != nil {
 		return stackoval.StackoVal{}, fmt.Errorf("error getting next instruction: %w", err)
 	}
-	// if len(top.Instructions) == 0 {
-	// 	_, err = vm.instructions.Pop()
-	// 	if err != nil {
-	// 		return stackoval.StackoVal{}, fmt.Errorf("error getting next instruction: %w", err)
-	// 	}
-	// 	return stackoval.StackoVal{StackoType: stackoval.StackoNop}, nil
-	// }
-
 	instruction := (*top).GetNext()
-	vm.advanceInstruction()
+	(*top).Advance()
+	if (*top).Finished() {
+		_, err = vm.instructions.Pop()
+		if err != nil {
+			return stackoval.StackoVal{}, fmt.Errorf("error getting next instruction: %w", err)
+		}
+	}
 	return instruction, nil
 }
 
@@ -81,22 +79,6 @@ func (vm *VM) executeInstruction(curr stackoval.StackoVal) error {
 		return vm.execWord(curr)
 	default:
 		vm.stack.Push(curr)
-	}
-	return nil
-}
-
-func (vm *VM) advanceInstruction() error {
-	top, err := vm.instructions.Peek()
-	if err != nil {
-		return fmt.Errorf("error getting next instruction: %w", err)
-	}
-
-	(*top).Advance()
-	if (*top).Finished() {
-		_, err = vm.instructions.Pop()
-		if err != nil {
-			return fmt.Errorf("error getting next instruction: %w", err)
-		}
 	}
 	return nil
 }

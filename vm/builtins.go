@@ -108,7 +108,7 @@ func (vm *VM) Times() error {
 	}
 
 	next := listise(b)
-	frame := NewRegularFrame(next, lim-1)
+	frame := NewLoopInstructionFrame(next, lim-1)
 	vm.instructions.Push(frame)
 	return nil
 }

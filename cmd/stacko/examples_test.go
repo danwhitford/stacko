@@ -24,24 +24,24 @@ func TestExamples(t *testing.T) {
 			"fib.txt",
 			"55",
 		},
-// 		{
-// 			"fizzbuzz.txt",
-// 			`1
-// 2
-// fizz
-// 4
-// buzz
-// fizz
-// 7
-// 8
-// fizz
-// buzz
-// 11
-// fizz
-// 13
-// 14
-// fizzbuzz`,
-// 		},
+		// 		{
+		// 			"fizzbuzz.txt",
+		// 			`1
+		// 2
+		// fizz
+		// 4
+		// buzz
+		// fizz
+		// 7
+		// 8
+		// fizz
+		// buzz
+		// 11
+		// fizz
+		// 13
+		// 14
+		// fizzbuzz`,
+		// 		},
 	}
 
 	for _, item := range table {
