@@ -379,6 +379,23 @@ func TestLoops(t *testing.T) {
 				Val:        15,
 			},
 		},
+		{
+			in: []stackoval.StackoVal{
+				{
+					StackoType: stackoval.StackoFn,
+					Val: []stackoval.StackoVal{
+						{StackoType: stackoval.StackoInt, Val: 5},
+						{StackoType: stackoval.StackoInt, Val: 4},
+						{StackoType: stackoval.StackoWord, Val: "+"},
+					},
+				},
+				{StackoType: stackoval.StackoWord, Val: "call"},
+			},
+			out: stackoval.StackoVal{
+				StackoType: stackoval.StackoInt,
+				Val:        9,
+			},
+		},
 	}
 
 	testTable(t, table)

@@ -83,9 +83,26 @@ func (vm *VM) execBuiltin(word string) (bool, error) {
 		return true, vm.Each()
 	case "times":
 		return true, vm.Times()
+	case "call":
+		return true, vm.Call()
 	default:
 		return false, nil
 	}
+}
+
+func (vm *VM) Call() error {
+	stack := &vm.stack
+	a, err := stack.Pop()
+	if err != nil {
+		return fmt.Errorf("error getting func to call: %w", err)
+	}
+	if a.StackoType != stackoval.StackoFn {
+		return fmt.Errorf("wanted fn for call but got %+v", a)
+	}
+	next := listise(a)
+	frame := NewRegularFrame(next)
+	vm.instructions.Push(frame)
+	return nil
 }
 
 func (vm *VM) Times() error {
@@ -180,7 +197,6 @@ func (vm *VM) If() error {
 		branch = falseBranch
 	}
 
-	fmt.Printf("%+v\n%+v\n%+v\n", falseBranch, trueBranch, branch)
 	next := listise(branch)
 	vm.Load(next)
 	return nil

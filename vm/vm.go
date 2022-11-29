@@ -20,12 +20,13 @@ func NewVM(r io.Writer) VM {
 		"true": {StackoType: stackoval.StackoBool, Val: true},
 	}
 	instructions := make(stack.Stack[InstructionFrame], 0)
-
+	
 	return VM{
 		dictionary,
 		instructions,
 		make(stack.Stack[stackoval.StackoVal], 0),
-		r}
+		r,
+	}
 }
 
 func (vm *VM) Reset() {
