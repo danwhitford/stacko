@@ -1,8 +1,8 @@
-(
+[
   dup 2 <
-  ( )
-  ( dup 1 - fib-rec swap 2 - fib-rec + )
+  [ ]
+  [ dup 1 - fib-rec swap 2 - fib-rec + ]
   if 
-) 'fib-rec def
+] 'fib-rec def
 
 10 fib-rec .

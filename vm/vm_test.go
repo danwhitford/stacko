@@ -357,32 +357,28 @@ func TestLoops(t *testing.T) {
 				Val:        5,
 			},
 		},
-		// {
-		// 	in: []stackoval.StackoVal{
-		// 		{StackoType: stackoval.StackoInt, Val: "0"},
-		// 		{StackoType: stackoval.StackoSymbol, Val: "+"},
-		// 		{
-		// 			StackoType: stackoval.StackoList,
-		// 			Val: []stackoval.StackoVal{
-		// 				{stackoval.StackoInt, 0},
-		// 				{stackoval.StackoInt, 1},
-		// 				{stackoval.StackoInt, 2},
-		// 				{stackoval.StackoInt, 3},
-		// 				{stackoval.StackoInt, 4},
-		// 				{stackoval.StackoInt, 5},
-		// 				{stackoval.StackoInt, 6},
-		// 				{stackoval.StackoInt, 7},
-		// 				{stackoval.StackoInt, 8},
-		// 				{stackoval.StackoInt, 9},
-		// 			},
-		// 		},
-		// 		{StackoType: stackoval.StackoWord, Val: "each"},
-		// 	},
-		// 	out: stackoval.StackoVal{
-		// 		StackoType: stackoval.StackoInt,
-		// 		Val:        15,
-		// 	},
-		// },
+		{
+			in: []stackoval.StackoVal{
+				{StackoType: stackoval.StackoInt, Val: 0},
+				{
+					StackoType: stackoval.StackoList,
+					Val: []stackoval.StackoVal{
+						{StackoType: stackoval.StackoInt, Val: 0},
+						{StackoType: stackoval.StackoInt, Val: 1},
+						{StackoType: stackoval.StackoInt, Val: 2},
+						{StackoType: stackoval.StackoInt, Val: 3},
+						{StackoType: stackoval.StackoInt, Val: 4},
+						{StackoType: stackoval.StackoInt, Val: 5},
+					},
+				},
+				{StackoType: stackoval.StackoSymbol, Val: "+"},
+				{StackoType: stackoval.StackoWord, Val: "each"},
+			},
+			out: stackoval.StackoVal{
+				StackoType: stackoval.StackoInt,
+				Val:        15,
+			},
+		},
 	}
 
 	testTable(t, table)

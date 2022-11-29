@@ -44,11 +44,11 @@ func (parser *Parser) parseToken() (stackoval.StackoVal, error) {
 		return stackoval.StackoVal{StackoType: stackoval.StackoString, Val: curr.V}, nil
 	case tokeniser.Tint:
 		return stackoval.StackoVal{StackoType: stackoval.StackoInt, Val: curr.V}, nil
-	case tokeniser.TLSqB:
+	case tokeniser.TLBrace:
 		return parser.readList()
 	case tokeniser.Tsymbol:
 		return stackoval.StackoVal{StackoType: stackoval.StackoSymbol, Val: curr.V}, nil
-	case tokeniser.TLB:
+	case tokeniser.TLSqB:
 		return parser.readFn()
 	default:
 		return stackoval.StackoVal{}, fmt.Errorf("unrecognised token type: %+v", curr)
@@ -60,7 +60,7 @@ func (parser *Parser) readList() (stackoval.StackoVal, error) {
 	parser.current++ // Eat the opening '['
 	for parser.current < parser.len {
 		curr := parser.tokens[parser.current]
-		if curr.TT == tokeniser.TRSqB {
+		if curr.TT == tokeniser.TRBrace {
 			return stackoval.StackoVal{StackoType: stackoval.StackoList, Val: listEls}, nil
 		}
 		thing, err := parser.parseToken()
@@ -79,7 +79,7 @@ func (parser *Parser) readFn() (stackoval.StackoVal, error) {
 	parser.current++ // Eat the opening '('
 	for parser.current < parser.len {
 		curr := parser.tokens[parser.current]
-		if curr.TT == tokeniser.TRB {
+		if curr.TT == tokeniser.TRSqB {
 			if len(listEls) == 0 {
 				return stackoval.StackoVal{StackoType: stackoval.StackoFn, Val: []stackoval.StackoVal{
 					{StackoType: stackoval.StackoNop, Val: nil},

@@ -18,11 +18,11 @@ func testTable(t *testing.T, table []struct {
 		parser = NewParser(tst.in)
 		vals, err := parser.Parse()
 		if err != nil {
-			t.Error(err)
+			t.Fatal(err)
 		}
 		diff := cmp.Diff(tst.out, vals)
 		if diff != "" {
-			t.Error(diff)
+			t.Fatal(diff)
 		}
 	}
 }
@@ -88,9 +88,9 @@ func TestLists(t *testing.T) {
 	}{
 		{
 			[]tokeniser.Token{
-				{TT: tokeniser.TLSqB, V: "[", Lexeme: "["},
+				{TT: tokeniser.TLBrace, V: "{", Lexeme: "}"},
 				{TT: tokeniser.Tstring, V: "foo bar", Lexeme: "foo bar"},
-				{TT: tokeniser.TRSqB, V: "]", Lexeme: "]"},
+				{TT: tokeniser.TRBrace, V: "}", Lexeme: "}"},
 			},
 			[]stackoval.StackoVal{
 				{StackoType: stackoval.StackoList, Val: []stackoval.StackoVal{
@@ -100,13 +100,13 @@ func TestLists(t *testing.T) {
 		},
 		{
 			[]tokeniser.Token{
-				{TT: tokeniser.TLSqB, V: "[", Lexeme: "["},
+				{TT: tokeniser.TLBrace, V: "{", Lexeme: "}"},
 				{TT: tokeniser.Tstring, V: "foo", Lexeme: "foo"},
-				{TT: tokeniser.TLSqB, V: "[", Lexeme: "["},
+				{TT: tokeniser.TLBrace, V: "{", Lexeme: "}"},
 				{TT: tokeniser.Tstring, V: "bar", Lexeme: "bar"},
 				{TT: tokeniser.Tstring, V: "baz", Lexeme: "baz"},
-				{TT: tokeniser.TRSqB, V: "]", Lexeme: "]"},
-				{TT: tokeniser.TRSqB, V: "]", Lexeme: "]"},
+				{TT: tokeniser.TRBrace, V: "}", Lexeme: "}"},
+				{TT: tokeniser.TRBrace, V: "}", Lexeme: "}"},
 			},
 			[]stackoval.StackoVal{
 				{StackoType: stackoval.StackoList, Val: []stackoval.StackoVal{
@@ -119,11 +119,11 @@ func TestLists(t *testing.T) {
 		},
 		{
 			[]tokeniser.Token{
-				{TT: tokeniser.TLSqB, V: "[", Lexeme: "["},
+				{TT: tokeniser.TLBrace, V: "{", Lexeme: "}"},
 				{TT: tokeniser.Tword, V: "foo", Lexeme: "foo"},
 				{TT: tokeniser.Tword, V: "bar", Lexeme: "bar"},
 				{TT: tokeniser.Tword, V: "baz", Lexeme: "baz"},
-				{TT: tokeniser.TRSqB, V: "]", Lexeme: "]"},
+				{TT: tokeniser.TRBrace, V: "}", Lexeme: "}"},
 			},
 			[]stackoval.StackoVal{
 				{StackoType: stackoval.StackoList, Val: []stackoval.StackoVal{
@@ -144,9 +144,9 @@ func TestFuncs(t *testing.T) {
 	}{
 		{
 			[]tokeniser.Token{
-				{TT: tokeniser.TLB, V: "(", Lexeme: "("},
+				{TT: tokeniser.TLSqB, V: "[", Lexeme: "["},
 				{TT: tokeniser.Tstring, V: "foo bar", Lexeme: "foo bar"},
-				{TT: tokeniser.TRB, V: ")", Lexeme: ")"},
+				{TT: tokeniser.TRSqB, V: "]", Lexeme: "]"},
 			},
 			[]stackoval.StackoVal{
 				{StackoType: stackoval.StackoFn, Val: []stackoval.StackoVal{
@@ -156,13 +156,13 @@ func TestFuncs(t *testing.T) {
 		},
 		{
 			[]tokeniser.Token{
-				{TT: tokeniser.TLB, V: "(", Lexeme: "("},
+				{TT: tokeniser.TLSqB, V: "[", Lexeme: "["},
 				{TT: tokeniser.Tstring, V: "foo", Lexeme: "foo"},
-				{TT: tokeniser.TLB, V: "(", Lexeme: "("},
+				{TT: tokeniser.TLSqB, V: "[", Lexeme: "["},
 				{TT: tokeniser.Tstring, V: "bar", Lexeme: "bar"},
 				{TT: tokeniser.Tstring, V: "baz", Lexeme: "baz"},
-				{TT: tokeniser.TRB, V: ")", Lexeme: ")"},
-				{TT: tokeniser.TRB, V: ")", Lexeme: ")"},
+				{TT: tokeniser.TRSqB, V: "]", Lexeme: "]"},
+				{TT: tokeniser.TRSqB, V: "]", Lexeme: "]"},
 			},
 			[]stackoval.StackoVal{
 				{StackoType: stackoval.StackoFn, Val: []stackoval.StackoVal{
@@ -175,11 +175,11 @@ func TestFuncs(t *testing.T) {
 		},
 		{
 			[]tokeniser.Token{
-				{TT: tokeniser.TLB, V: "(", Lexeme: "("},
+				{TT: tokeniser.TLSqB, V: "[", Lexeme: "["},
 				{TT: tokeniser.Tword, V: "foo", Lexeme: "foo"},
 				{TT: tokeniser.Tword, V: "bar", Lexeme: "bar"},
 				{TT: tokeniser.Tword, V: "baz", Lexeme: "baz"},
-				{TT: tokeniser.TRB, V: ")", Lexeme: ")"},
+				{TT: tokeniser.TRSqB, V: "]", Lexeme: "]"},
 			},
 			[]stackoval.StackoVal{
 				{StackoType: stackoval.StackoFn, Val: []stackoval.StackoVal{

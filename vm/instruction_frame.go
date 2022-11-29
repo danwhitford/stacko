@@ -1,6 +1,7 @@
 package vm
 
 import (
+
 	"github.com/danwhitford/stacko/stackoval"
 )
 
@@ -75,4 +76,48 @@ func (frame *LoopInstructionFrame) GetNext() stackoval.StackoVal {
 func (frame *LoopInstructionFrame) Advance() error {
 	frame.InstructionPointer++
 	return nil
+}
+
+type EachInstrictionFrame struct {
+	QuotationFrame *RegularFrame
+	Data           []stackoval.StackoVal
+	DataPointer    int
+	ReturnData     bool
+}
+
+func NewEachInstructionFrame(vals, data []stackoval.StackoVal) *EachInstrictionFrame {
+	frame := NewRegularFrame(vals)
+	return &EachInstrictionFrame{
+		QuotationFrame: frame,
+		Data:           data,
+		DataPointer:    0,
+		ReturnData:     true,
+	}
+}
+
+func (frame *EachInstrictionFrame) GetNext() stackoval.StackoVal {
+	if frame.ReturnData {
+		return frame.Data[frame.DataPointer]
+	} else {
+		return frame.QuotationFrame.GetNext()
+	}
+}
+
+func (frame *EachInstrictionFrame) Advance() error {
+	if !frame.ReturnData {
+		frame.QuotationFrame.Advance()
+		if frame.QuotationFrame.Finished() {
+			frame.QuotationFrame.InstructionPointer = 0
+		}
+	} else {
+		frame.DataPointer++
+	}
+
+	frame.ReturnData = !frame.ReturnData
+
+	return nil
+}
+
+func (frame *EachInstrictionFrame) Finished() bool {
+	return frame.DataPointer >= len(frame.Data) && frame.ReturnData
 }

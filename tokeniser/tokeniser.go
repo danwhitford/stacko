@@ -20,6 +20,8 @@ const (
 	Tsymbol
 	TLB
 	TRB
+	TLBrace
+	TRBrace
 )
 
 type Token struct {
@@ -84,6 +86,16 @@ func (t Tokeniser) Tokenise() ([]Token, error) {
 				token := Token{TRB, ")", ")"}
 				tokens = append(tokens, token)
 			}
+		case (curr == '{'):
+			{
+				token := Token{TLBrace, "{", "{"}
+				tokens = append(tokens, token)
+			}
+		case (curr == '}'):
+			{
+				token := Token{TRBrace, "}", "}"}
+				tokens = append(tokens, token)
+			}
 		case (curr == '\''):
 			token, err := t.readSymbol()
 			if err != nil {
@@ -111,7 +123,7 @@ func (t *Tokeniser) readSymbol() (Token, error) {
 	var sb strings.Builder
 	for t.current < t.len {
 		curr := t.src[t.current]
-		if unicode.IsSpace(curr) || curr == ']' || curr == ')' {
+		if unicode.IsSpace(curr) || curr == ']' || curr == ')' || curr == '}' {
 			t.current-- // Put back so curr is processed in main loop
 			return Token{Tsymbol, sb.String(), fmt.Sprintf("'%s", sb.String())}, nil
 		}
@@ -125,7 +137,7 @@ func (t *Tokeniser) readWord() (Token, error) {
 	var sb strings.Builder
 	for t.current < t.len {
 		curr := t.src[t.current]
-		if unicode.IsSpace(curr) || curr == ']' || curr == ')' {
+		if unicode.IsSpace(curr) || curr == ']' || curr == ')' || curr == '}' {
 			t.current-- // Put back so curr is processed in main loop
 			return Token{Tword, sb.String(), sb.String()}, nil
 		}

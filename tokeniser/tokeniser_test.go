@@ -163,6 +163,16 @@ func TestList(t *testing.T) {
 				{TRSqB, "]", "]"},
 			},
 		},
+		{
+			`{foo bar baz}`,
+			[]Token{
+				{TLBrace, "{", "{"},
+				{Tword, "foo", "foo"},
+				{Tword, "bar", "bar"},
+				{Tword, "baz", "baz"},
+				{TRBrace, "}", "}"},
+			},
+		},
 	}
 	testTable(t, table)
 }

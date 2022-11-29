@@ -114,16 +114,18 @@ func (vm *VM) Times() error {
 }
 
 func (vm *VM) Each() error {
-	// stack := &vm.stack
-	// a, err := stack.Pop()
-	// if err != nil {
-	// 	return fmt.Errorf("error getting false branch: %w", err)
-	// }
-	// if a.StackoType != stackoval.StackoList {
-	// 	return fmt.Errorf("wanted list for range but got %+v", a)
-	// }
-	// lim := a.Val.(int)
-	// vm.loopControlStack.Push(LoopControlFrame{lim})
+	stack := &vm.stack
+	fn, err := stack.Pop()
+	if err != nil {
+		return fmt.Errorf("error getting false branch: %w", err)
+	}
+	data, err := stack.Pop()
+	if err != nil {
+		return fmt.Errorf("error getting false branch: %w", err)
+	}
+	frame := NewEachInstructionFrame(listise(fn), listise(data))
+	vm.instructions.Push(frame)
+
 	return nil
 }
 
@@ -186,7 +188,7 @@ func (vm *VM) If() error {
 
 func listise(val stackoval.StackoVal) []stackoval.StackoVal {
 	switch val.StackoType {
-	case stackoval.StackoFn:
+	case stackoval.StackoFn, stackoval.StackoList:
 		casted := val.Val.([]stackoval.StackoVal)
 		return casted
 	case stackoval.StackoSymbol:

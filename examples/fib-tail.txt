@@ -1,17 +1,17 @@
-(
+[
   over over
-) 'twodup def
+] 'twodup def
 
-(  
+[  
   dup 2 >
-  ( rot rot 
+  [ rot rot 
     twodup + rot drop
     rot
     1 - fib-tail 
-  )
-  ( drop )
+  ]
+  [ drop ]
   if
-) 'fib-tail def
+] 'fib-tail def
 
 1 1 10
 fib-tail
