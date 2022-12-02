@@ -13,10 +13,10 @@
   rpush 0 inner
 ] 'range def
 
-[
-  dup 0 >
-  [ v "" . swap dup call swap 1 - times ]
-  [ ]
+[    
+  dup 0 > swap rpush
+  [ dup rpush call rpop rpop 1 - times ]
+  [ rpop drop drop ]
   if
 ] 'times def
 

@@ -450,5 +450,8 @@ func testTable(t *testing.T, table []struct {
 		if diff != "" {
 			t.Fatalf("failed %s\n(-want +got):\n%s", test.in, diff)
 		}
+		if !machine.returnStack.Empty() {
+			t.Fatalf("should leave return stack empty but contains %v for %v", machine.returnStack, test.in)
+		}
 	}
 }
