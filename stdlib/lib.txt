@@ -1,0 +1,25 @@
+[
+  rot branch call
+] 'if def
+
+[
+  [
+    dup rpop dup rpush <
+    [ dup rot rot append swap 1 + inner ]
+    [ rpop drop drop]
+    if
+  ] 'inner def
+  {} swap
+  rpush 0 inner
+] 'range def
+
+[
+  dup 0 >
+  [ v "" . swap dup call swap 1 - times ]
+  [ ]
+  if
+] 'times def
+
+[
+  "hello world" .
+] 'say-hello def

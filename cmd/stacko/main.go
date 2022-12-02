@@ -45,8 +45,12 @@ func (runner *Runner) doLine(s string) error {
 
 func repl() {
 	scanner := bufio.NewScanner(os.Stdin)
+	machine, err := vm.NewVM(os.Stdout)
+	if err != nil {
+		panic(err)
+	}
 	runner := Runner{
-		vm: vm.NewVM(os.Stdout),
+		vm: machine,
 	}
 
 	for scanner.Scan() {
@@ -67,8 +71,12 @@ func runFile(fname string, outf io.Writer) {
 	if err != nil {
 		panic(err)
 	}
+	machine, err := vm.NewVM(os.Stdout)
+	if err != nil {
+		panic(err)
+	}
 	runner := Runner{
-		vm: vm.NewVM(outf),
+		vm: machine,
 	}
 	err = runner.doLine(string(b))
 	if err != nil {

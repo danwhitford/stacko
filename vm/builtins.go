@@ -71,22 +71,86 @@ func (vm *VM) execBuiltin(word string) (bool, error) {
 		return true, vm.Gt()
 	case "<":
 		return true, vm.Lt()
-	case "if":
-		return true, vm.If()
 	case "clear":
 		return true, vm.Clear()
 	case "nuke":
 		return true, vm.Nuke()
-	case "range":
-		return true, vm.Range()
-	case "each":
-		return true, vm.Each()
-	case "times":
-		return true, vm.Times()
 	case "call":
 		return true, vm.Call()
+	case "branch":
+		return true, vm.Branch()
+	case "rpush":
+		return true, vm.ReturnPush()
+	case "rpop":
+		return true, vm.ReturnPop()
+	case "append":
+		return true, vm.Append()
 	default:
 		return false, nil
+	}
+}
+
+func (vm *VM) Append() error {
+	stack := &vm.stack
+	a, err := stack.Pop()
+	if err != nil {
+		return fmt.Errorf("error getting func to call: %w", err)
+	}
+	b, err := stack.Pop()
+	if err != nil {
+		return fmt.Errorf("error getting func to call: %w", err)
+	}
+	if b.StackoType != stackoval.StackoList {
+		return fmt.Errorf("need list for concat but got %+v", b.StackoType)
+	}
+	els := b.Val.([]stackoval.StackoVal)
+	els = append(els, a)
+	b.Val = els
+	stack.Push(b)
+	return nil
+}
+
+func (vm *VM) ReturnPush() error {
+	stack := &vm.stack
+	returnStack := &vm.returnStack
+	a, err := stack.Pop()
+	if err != nil {
+		return fmt.Errorf("error getting func to call: %w", err)
+	}
+	returnStack.Push(a)
+	return err
+}
+
+func (vm *VM) ReturnPop() error {
+	stack := &vm.stack
+	returnStack := &vm.returnStack
+	a, err := returnStack.Pop()
+	if err != nil {
+		return fmt.Errorf("error getting func to call: %w", err)
+	}
+	stack.Push(a)
+	return err
+}
+
+
+func (vm *VM) Branch() error {
+	stack := &vm.stack
+	a, err := stack.Pop()
+	if err != nil {
+		return fmt.Errorf("error getting func to call: %w", err)
+	}
+	if a.StackoType != stackoval.StackoBool {
+		return fmt.Errorf("need boolean for branch but got %+v", a)
+	}
+	cond := a.Val.(bool)
+	if cond {
+		return vm.Drop()
+	} else {
+		err := vm.Swap()
+		if err != nil {
+			return err
+		}
+		return vm.Drop()
 	}
 }
 
@@ -97,71 +161,11 @@ func (vm *VM) Call() error {
 		return fmt.Errorf("error getting func to call: %w", err)
 	}
 	if a.StackoType != stackoval.StackoFn {
-		return fmt.Errorf("wanted fn for call but got %+v", a)
+		return fmt.Errorf("wanted fn for call but got %v", a)
 	}
 	next := listise(a)
 	frame := NewRegularFrame(next)
-	vm.instructions.Push(frame)
-	return nil
-}
-
-func (vm *VM) Times() error {
-	stack := &vm.stack
-	a, err := stack.Pop()
-	if err != nil {
-		return fmt.Errorf("error getting false branch: %w", err)
-	}
-	if a.StackoType != stackoval.StackoInt {
-		return fmt.Errorf("wanted int for range but got %+v", a)
-	}
-	lim := a.Val.(int)
-
-	b, err := stack.Pop()
-	if err != nil {
-		return fmt.Errorf("error getting false branch: %w", err)
-	}
-	if b.StackoType != stackoval.StackoFn {
-		return fmt.Errorf("wanted function for range but got %+v", a)
-	}
-
-	next := listise(b)
-	frame := NewLoopInstructionFrame(next, lim-1)
-	vm.instructions.Push(frame)
-	return nil
-}
-
-func (vm *VM) Each() error {
-	stack := &vm.stack
-	fn, err := stack.Pop()
-	if err != nil {
-		return fmt.Errorf("error getting false branch: %w", err)
-	}
-	data, err := stack.Pop()
-	if err != nil {
-		return fmt.Errorf("error getting false branch: %w", err)
-	}
-	frame := NewEachInstructionFrame(listise(fn), listise(data))
-	vm.instructions.Push(frame)
-
-	return nil
-}
-
-func (vm *VM) Range() error {
-	stack := &vm.stack
-	a, err := stack.Pop()
-	if err != nil {
-		return fmt.Errorf("error getting false branch: %w", err)
-	}
-	if a.StackoType != stackoval.StackoInt {
-		return fmt.Errorf("wanted int for range but got %+v", a)
-	}
-	lim := a.Val.(int)
-	ret := make([]stackoval.StackoVal, lim)
-	for i := range ret {
-		ret[i] = stackoval.StackoVal{StackoType: stackoval.StackoInt, Val: i}
-	}
-	val := stackoval.StackoVal{StackoType: stackoval.StackoList, Val: ret}
-	stack.Push(val)
+	vm.callStack.Push(frame)
 	return nil
 }
 

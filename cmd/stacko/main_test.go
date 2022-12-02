@@ -12,10 +12,14 @@ import (
 
 func run(t *testing.T, in string, out string) {
 	var w bytes.Buffer
-	runner := Runner{
-		vm: vm.NewVM(&w),
+	machine, err := vm.NewVM(&w)
+	if err != nil {
+		t.Fatal(err)
 	}
-	err := runner.doLine(in)
+	runner := Runner{
+		vm: machine,
+	}
+	err = runner.doLine(in)
 	if err != nil {
 		t.Fatal(err)
 	}

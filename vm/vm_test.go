@@ -74,55 +74,58 @@ func TestMaths(t *testing.T) {
 
 	for _, tst := range tests {
 		t.Log(tst)
-		vm := NewVM(os.Stdout)
-		vm.Load(tst.input)
-		err := vm.Execute()
+		machine, err := NewVM(os.Stdout)
+		if err != nil {
+			t.Fatal(err)
+		}
+		machine.Load(tst.input)
+		err = machine.Execute()
 		if err != nil {
 			t.Fatal(err)
 		}
 
-		if vm.stack[0].Val != tst.expected {
-			t.Fatalf("can't do maffs for %+v got %+v", tst, vm.stack[0])
+		if machine.stack[0].Val != tst.expected {
+			t.Fatalf("can't do maffs for %+v got %+v", tst, machine.stack[0])
 		}
 	}
 }
 
 func ExampleDup() {
-	vm := NewVM(os.Stdout)
-	vm.Load([]stackoval.StackoVal{
+	machine, _ := NewVM(os.Stdout)
+	machine.Load([]stackoval.StackoVal{
 		{StackoType: stackoval.StackoInt, Val: 1},
 		{StackoType: stackoval.StackoWord, Val: "dup"},
 		{StackoType: stackoval.StackoWord, Val: "v"},
 	})
-	vm.Execute()
+	machine.Execute()
 	// Output:
 	// 1
 	// 1
 }
 
 func ExampleSwap() {
-	vm := NewVM(os.Stdout)
-	vm.Load([]stackoval.StackoVal{
+	machine, _ := NewVM(os.Stdout)
+	machine.Load([]stackoval.StackoVal{
 		{StackoType: stackoval.StackoInt, Val: 1},
 		{StackoType: stackoval.StackoInt, Val: 2},
 		{StackoType: stackoval.StackoWord, Val: "swap"},
 		{StackoType: stackoval.StackoWord, Val: "v"},
 	})
-	vm.Execute()
+	machine.Execute()
 	// Output:
 	// 1
 	// 2
 }
 
 func ExampleOver() {
-	vm := NewVM(os.Stdout)
-	vm.Load([]stackoval.StackoVal{
+	machine, _ := NewVM(os.Stdout)
+	machine.Load([]stackoval.StackoVal{
 		{StackoType: stackoval.StackoInt, Val: 1},
 		{StackoType: stackoval.StackoInt, Val: 2},
 		{StackoType: stackoval.StackoWord, Val: "over"},
 		{StackoType: stackoval.StackoWord, Val: "v"},
 	})
-	vm.Execute()
+	machine.Execute()
 	// Output:
 	// 1
 	// 2
@@ -130,15 +133,15 @@ func ExampleOver() {
 }
 
 func ExampleRot() {
-	vm := NewVM(os.Stdout)
-	vm.Load([]stackoval.StackoVal{
+	machine, _ := NewVM(os.Stdout)
+	machine.Load([]stackoval.StackoVal{
 		{StackoType: stackoval.StackoInt, Val: 1},
 		{StackoType: stackoval.StackoInt, Val: 2},
 		{StackoType: stackoval.StackoInt, Val: 3},
 		{StackoType: stackoval.StackoWord, Val: "rot"},
 		{StackoType: stackoval.StackoWord, Val: "v"},
 	})
-	vm.Execute()
+	machine.Execute()
 	// Output:
 	// 1
 	// 3
@@ -146,21 +149,21 @@ func ExampleRot() {
 }
 
 func ExampleDrop() {
-	vm := NewVM(os.Stdout)
-	vm.Load([]stackoval.StackoVal{
+	machine, _ := NewVM(os.Stdout)
+	machine.Load([]stackoval.StackoVal{
 		{StackoType: stackoval.StackoInt, Val: 1},
 		{StackoType: stackoval.StackoInt, Val: 2},
 		{StackoType: stackoval.StackoWord, Val: "drop"},
 		{StackoType: stackoval.StackoWord, Val: "v"},
 	})
-	vm.Execute()
+	machine.Execute()
 	// Output:
 	// 1
 }
 
 func ExampleVM_PrintStack() {
-	vm := NewVM(os.Stdout)
-	vm.Load([]stackoval.StackoVal{
+	machine, _ := NewVM(os.Stdout)
+	machine.Load([]stackoval.StackoVal{
 		{StackoType: stackoval.StackoList, Val: []stackoval.StackoVal{
 			{StackoType: stackoval.StackoString, Val: "foo"},
 			{StackoType: stackoval.StackoString, Val: "bar"},
@@ -174,15 +177,15 @@ func ExampleVM_PrintStack() {
 			}}}},
 		{StackoType: stackoval.StackoWord, Val: "v"},
 	})
-	vm.Execute()
+	machine.Execute()
 	// Output:
 	// [foo [bar baz]]
 	// [foo bar baz]
 }
 
 func ExampleDefVar() {
-	vm := NewVM(os.Stdout)
-	vm.Load([]stackoval.StackoVal{
+	machine, _ := NewVM(os.Stdout)
+	machine.Load([]stackoval.StackoVal{
 		{StackoType: stackoval.StackoInt, Val: 5},
 		{StackoType: stackoval.StackoSymbol, Val: "foo"},
 		{StackoType: stackoval.StackoWord, Val: "def"},
@@ -191,7 +194,7 @@ func ExampleDefVar() {
 		{StackoType: stackoval.StackoWord, Val: "+"},
 		{StackoType: stackoval.StackoWord, Val: "v"},
 	})
-	err := vm.Execute()
+	err := machine.Execute()
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -200,14 +203,14 @@ func ExampleDefVar() {
 }
 
 func ExamplePrintTop() {
-	vm := NewVM(os.Stdout)
-	vm.Load([]stackoval.StackoVal{
+	machine, _ := NewVM(os.Stdout)
+	machine.Load([]stackoval.StackoVal{
 		{StackoType: stackoval.StackoInt, Val: 100},
 		{StackoType: stackoval.StackoInt, Val: 20},
 		{StackoType: stackoval.StackoWord, Val: "/"},
 		{StackoType: stackoval.StackoWord, Val: "."},
 	})
-	err := vm.Execute()
+	err := machine.Execute()
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -221,9 +224,29 @@ func TestIfStuff(t *testing.T) {
 		out stackoval.StackoVal
 	}{
 		{in: []stackoval.StackoVal{
-			{StackoType: stackoval.StackoBool, Val: true},
 			{StackoType: stackoval.StackoString, Val: "yes"},
 			{StackoType: stackoval.StackoString, Val: "no"},
+			{StackoType: stackoval.StackoBool, Val: true},
+			{StackoType: stackoval.StackoWord, Val: "branch"},
+		},
+			out: stackoval.StackoVal{StackoType: stackoval.StackoString, Val: "yes"},
+		},
+		{in: []stackoval.StackoVal{
+			{StackoType: stackoval.StackoString, Val: "yes"},
+			{StackoType: stackoval.StackoString, Val: "no"},
+			{StackoType: stackoval.StackoBool, Val: false},
+			{StackoType: stackoval.StackoWord, Val: "branch"},
+		},
+			out: stackoval.StackoVal{StackoType: stackoval.StackoString, Val: "no"},
+		},
+		{in: []stackoval.StackoVal{
+			{StackoType: stackoval.StackoBool, Val: true},
+			{StackoType: stackoval.StackoFn, Val: []stackoval.StackoVal{
+				{StackoType: stackoval.StackoString, Val: "yes"},
+			}},
+			{StackoType: stackoval.StackoFn, Val: []stackoval.StackoVal{
+				{StackoType: stackoval.StackoString, Val: "no"},
+			}},
 			{StackoType: stackoval.StackoWord, Val: "if"},
 		},
 			out: stackoval.StackoVal{StackoType: stackoval.StackoString, Val: "yes"},
@@ -262,8 +285,12 @@ func TestIfStuff(t *testing.T) {
 			{StackoType: stackoval.StackoInt, Val: 10},
 			{StackoType: stackoval.StackoInt, Val: 10},
 			{StackoType: stackoval.StackoBool, Val: true},
-			{StackoType: stackoval.StackoSymbol, Val: "*"},
-			{StackoType: stackoval.StackoSymbol, Val: "+"},
+			{StackoType: stackoval.StackoFn, Val: []stackoval.StackoVal{
+				{StackoType: stackoval.StackoWord, Val: "*"},
+			}},
+			{StackoType: stackoval.StackoFn, Val: []stackoval.StackoVal{
+				{StackoType: stackoval.StackoWord, Val: "+"},
+			}},
 			{StackoType: stackoval.StackoWord, Val: "if"},
 		},
 			out: stackoval.StackoVal{StackoType: stackoval.StackoInt, Val: 100},
@@ -406,14 +433,16 @@ func testTable(t *testing.T, table []struct {
 	out stackoval.StackoVal
 }) {
 	for _, test := range table {
-		fmt.Printf("testing %v\n", test.in)
-		vm := NewVM(os.Stdout)
-		vm.Load(test.in)
-		err := vm.Execute()
+		machine, err := NewVM(os.Stdout)
+		if err != nil {
+			t.Fatal(err)
+		}
+		machine.Load(test.in)
+		err = machine.Execute()
 		if err != nil {
 			t.Fatalf("%s\n%s", test.in, err)
 		}
-		top, err := vm.stack.Peek()
+		top, err := machine.stack.Peek()
 		if err != nil {
 			t.Fatal(err)
 		}
