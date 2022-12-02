@@ -132,7 +132,6 @@ func (vm *VM) ReturnPop() error {
 	return err
 }
 
-
 func (vm *VM) Branch() error {
 	stack := &vm.stack
 	a, err := stack.Pop()
