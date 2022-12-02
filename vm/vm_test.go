@@ -90,7 +90,7 @@ func TestMaths(t *testing.T) {
 	}
 }
 
-func ExampleDup() {
+func ExampleVM_Dup() {
 	machine, _ := NewVM(os.Stdout)
 	machine.Load([]stackoval.StackoVal{
 		{StackoType: stackoval.StackoInt, Val: 1},
@@ -103,7 +103,7 @@ func ExampleDup() {
 	// 1
 }
 
-func ExampleSwap() {
+func ExampleVM_Swap() {
 	machine, _ := NewVM(os.Stdout)
 	machine.Load([]stackoval.StackoVal{
 		{StackoType: stackoval.StackoInt, Val: 1},
@@ -117,7 +117,7 @@ func ExampleSwap() {
 	// 2
 }
 
-func ExampleOver() {
+func ExampleVM_Over() {
 	machine, _ := NewVM(os.Stdout)
 	machine.Load([]stackoval.StackoVal{
 		{StackoType: stackoval.StackoInt, Val: 1},
@@ -132,7 +132,7 @@ func ExampleOver() {
 	// 1
 }
 
-func ExampleRot() {
+func ExampleVM_Rot() {
 	machine, _ := NewVM(os.Stdout)
 	machine.Load([]stackoval.StackoVal{
 		{StackoType: stackoval.StackoInt, Val: 1},
@@ -148,7 +148,7 @@ func ExampleRot() {
 	// 2
 }
 
-func ExampleDrop() {
+func ExampleVM_Drop() {
 	machine, _ := NewVM(os.Stdout)
 	machine.Load([]stackoval.StackoVal{
 		{StackoType: stackoval.StackoInt, Val: 1},
@@ -183,7 +183,7 @@ func ExampleVM_PrintStack() {
 	// [foo bar baz]
 }
 
-func ExampleDefVar() {
+func ExampleVM_Def() {
 	machine, _ := NewVM(os.Stdout)
 	machine.Load([]stackoval.StackoVal{
 		{StackoType: stackoval.StackoInt, Val: 5},
@@ -202,7 +202,7 @@ func ExampleDefVar() {
 	// 10
 }
 
-func ExamplePrintTop() {
+func ExampleVM_PrintTop() {
 	machine, _ := NewVM(os.Stdout)
 	machine.Load([]stackoval.StackoVal{
 		{StackoType: stackoval.StackoInt, Val: 100},
@@ -356,16 +356,16 @@ func TestLoops(t *testing.T) {
 			out: stackoval.StackoVal{
 				StackoType: stackoval.StackoList,
 				Val: []stackoval.StackoVal{
-					{stackoval.StackoInt, 0},
-					{stackoval.StackoInt, 1},
-					{stackoval.StackoInt, 2},
-					{stackoval.StackoInt, 3},
-					{stackoval.StackoInt, 4},
-					{stackoval.StackoInt, 5},
-					{stackoval.StackoInt, 6},
-					{stackoval.StackoInt, 7},
-					{stackoval.StackoInt, 8},
-					{stackoval.StackoInt, 9},
+					{StackoType: stackoval.StackoInt, Val: 0},
+					{StackoType: stackoval.StackoInt, Val: 1},
+					{StackoType: stackoval.StackoInt, Val: 2},
+					{StackoType: stackoval.StackoInt, Val: 3},
+					{StackoType: stackoval.StackoInt, Val: 4},
+					{StackoType: stackoval.StackoInt, Val: 5},
+					{StackoType: stackoval.StackoInt, Val: 6},
+					{StackoType: stackoval.StackoInt, Val: 7},
+					{StackoType: stackoval.StackoInt, Val: 8},
+					{StackoType: stackoval.StackoInt, Val: 9},
 				},
 			},
 		},
