@@ -1,8 +1,0 @@
-[
-  dup 1 = 
-  [ ]
-  [ dup 1 - fact * ]
-  if 
-] 'fact def
-
-10 fact .
