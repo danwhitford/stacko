@@ -1,2 +1,5 @@
 .vscode/
 in.txt
+compiled/
+*~
+
