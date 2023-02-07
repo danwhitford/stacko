@@ -4,45 +4,43 @@
   (define src-lines
     (port->lines port))
   (define src-datums
-    (format-datums '(handle ~a) src-lines))
+    (format-datums '~a src-lines))
   (define module-datum
-    `(module stacker-mod "funstacker.rkt" ,@src-datums))
+    `(module funstacker-mod "funstacker.rkt" (handle-args ,@src-datums)))
   (datum->syntax #f module-datum))
 
 (provide read-syntax)
 
-(define-macro (stacker-module-begin HANDLE-EXPR ...)
+(define-macro (funstacker-module-begin HANDLE-ARGS-EXPR)
   #'(#%module-begin     
-     HANDLE-EXPR ...))
+     HANDLE-ARGS-EXPR))
 
-(provide (rename-out [stacker-module-begin #%module-begin]))
+(provide (rename-out [funstacker-module-begin #%module-begin]))
 
-(define stack empty)
-
-(define (pop-stack!)
-  (define arg (first stack))
-  (set! stack (rest stack))
-  arg)
-
-(define (push-stack! val)
-  (set! stack (cons val stack)))
-
-(define (handle [arg #f])  
-  (cond
-    [(number? arg) (push-stack! arg)]
-    [(equal? \t arg) (t)]
-    [(equal? \v arg) (v)]
+(define (handle-args . args)  
+  (for/fold ([stack-acc empty])
+            ([arg (in-list args)]
+             #:unless (void? arg))
+   (cond
+    [(number? arg) (cons arg stack-acc)]
+    [(equal? \t arg) (t stack-acc)]
+    [(equal? \v arg) (v stack-acc) stack-acc]
     [(or (equal? + arg) (equal? * arg))
-     (define op-result (arg (pop-stack!) (pop-stack!)))
-     (push-stack! op-result)]))
+     (define op-result (arg (first stack-acc) (second stack-acc)))
+     (cons op-result (drop stack-acc 2))])))
 
-(define (v)
-  (println "--> top")
-  (for-each println stack)
-  (println "---"))
+(define (v stack)
+  (if (empty? stack)
+      (println "--> empty")
+      (begin
+        (println "--> top")
+        (for-each println stack)
+        (println "---"))))
 
-(define (t)
-  (println (pop-stack!)))
+(define (t stack)
+  (define val (first stack))
+  (println val)
+  (rest stack))
 
-(provide handle)
+(provide handle-args)
 (provide + * t v)
